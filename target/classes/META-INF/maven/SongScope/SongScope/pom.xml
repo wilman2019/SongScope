@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>SongScope</groupId>
+  <artifactId>SongScope</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <dependencies>
+        <!-- Add your dependencies here -->
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-media -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-media</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-web -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-web</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-swing -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-swing</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-fxml</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-base</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-graphics -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-graphics</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+	<dependency>
+	    <groupId>org.openjfx</groupId>
+	    <artifactId>javafx-controls</artifactId>
+	    <version>23-ea+3</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <!-- Add more dependencies as needed -->
+  </dependencies>
+    
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <release>21</release>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
