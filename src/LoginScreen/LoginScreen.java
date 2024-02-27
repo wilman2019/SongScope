@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
@@ -23,6 +25,8 @@ import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.JTextArea;
 import java.awt.Font;
+import java.awt.GridLayout;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
@@ -30,7 +34,11 @@ import javax.swing.JButton;
 public class LoginScreen extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
+
+    private JPanel contentPane; // delete this 
+
+	private JPanel picPanel;
+    private JPanel inputPanel;
 	private JTextField txtEnterUsername;
 	private JPasswordField txtEnterPassword;
 	private HashMap<String, HandleSignup> signupMap;
@@ -59,62 +67,86 @@ public class LoginScreen extends JFrame {
 	 * Create the frame.
 	 */
 	public LoginScreen() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1354, 768);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel();
+        
+        picPanel = new JPanel(); // Create new panel for Login section
+        picPanel.setBorder(new EmptyBorder(5, 5, 5, 5)); // Set border for panel
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program on close
+        setBounds(100, 100, 1354, 768); // Set size of frame
+        picPanel.setLayout(null);
+                
         ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
-        Image image = imageIcon.getImage().getScaledInstance(1230, 692, Image.SCALE_SMOOTH);
-        lblNewLabel.setIcon(new ImageIcon(image));
-        lblNewLabel.setBounds(10, 10, 1230, 692);
-        contentPane.add(lblNewLabel);
+        Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+        JLabel picLabel = new JLabel(new ImageIcon(image));
+        picPanel.add(picLabel);
         
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(255, 255, 255, 200));
-        panel.setBounds(464, 89, 423, 515);
-        panel.setOpaque(true);
-        contentPane.add(panel);
+        // Allows picture to be resized with frame
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Scale the image to the new size of the frame
+                Image newImage = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+                picLabel.setIcon(new ImageIcon(newImage));
+
+                // fixes small bug where white area would show at top
+                picLabel.setBounds(0, 0, getWidth(), getHeight());
+            }
+        });
         
-        contentPane.setComponentZOrder(panel, 0);
+        setContentPane(picPanel); // Set panel as content pane
+
+
+
+        inputPanel = new JPanel(); // Create new panel for Login section
+
+        inputPanel.setBackground(new Color(255, 255, 255, 200));
+        inputPanel.setBounds(464, 89, 423, 515);
+        inputPanel.setOpaque(true);
+        inputPanel.setLayout(null);
+        picPanel.add(inputPanel);
         
-        JTextArea txtrPassword = new JTextArea();
-        txtrPassword.setBackground(new Color(0, 0, 0, 1));
-        txtrPassword.setBounds(500, 350, 100, 25);
-        txtrPassword.setText("Password");
-        panel.add(txtrPassword);
-        contentPane.setComponentZOrder(txtrPassword, 0);
-        txtrPassword.setEditable(false);
+        picPanel.setComponentZOrder(inputPanel, 0);
+
+        // Create a JLabel for the title
+        JLabel lblTitle = new JLabel("Login");
+        lblTitle.setFont(new Font("Monospaced", Font.BOLD, 36));
+        lblTitle.setBounds((inputPanel.getWidth() - lblTitle.getPreferredSize().width) / 2, 10, lblTitle.getPreferredSize().width, lblTitle.getPreferredSize().height);
+        inputPanel.add(lblTitle);
+
+
+        // Calculate the y-coordinate for the middle of the inputPanel
+        int middleY = inputPanel.getHeight() / 2;
+
+        // Create a JLabel for the username
+        JLabel lblUsername = new JLabel("Username:");
+        lblUsername.setBounds(10, middleY - 40, 100, 25);
+        inputPanel.add(lblUsername);
+
+        // Create a JTextField for the username input
+        JTextField inputUsername = new JTextField();
+        inputUsername.setBounds(120, middleY - 40, 100, 25);
+        inputPanel.add(inputUsername);
+
+        // Create a JLabel for the password
+        JLabel lblPassword = new JLabel("Password:");
+        lblPassword.setBounds(10, middleY, 100, 25);
+        inputPanel.add(lblPassword);
+
+        // Create a JPasswordField for the password input
+        JPasswordField inputPassword = new JPasswordField();
+        inputPassword.setBounds(120, middleY, 100, 25);
+        inputPassword.setEchoChar('*');
+        inputPassword.setColumns(10);
+        inputPanel.add(inputPassword);
+
+        // Create a login button
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2, inputPanel.getHeight() - loginButton.getPreferredSize().height - 10, loginButton.getPreferredSize().width, loginButton.getPreferredSize().height);
+        inputPanel.add(loginButton);
+
+
         
-        txtEnterPassword = new JPasswordField();
-        txtEnterPassword.setBounds(500, 370, 100, 25);
-        panel.add(txtEnterPassword);
-        txtEnterPassword.setColumns(10);
-        contentPane.setComponentZOrder(txtEnterPassword, 0);
-        
-        txtEnterUsername = new JTextField();
-        txtEnterUsername.setBounds(500, 320, 100, 25);
-        panel.add(txtEnterUsername);
-        txtEnterUsername.setColumns(10);
-        contentPane.setComponentZOrder(txtEnterUsername, 0);
-        
-        JTextArea txtrUsername = new JTextArea();
-        panel.setBackground(new Color(255, 255, 255, 200));
-        txtrUsername.setBackground(new Color(0, 0, 0, 1));
-        txtrUsername.setBounds(500, 300, 100, 25);
-        txtrUsername.setText("Username");
-        panel.add(txtrUsername);
-        contentPane.setComponentZOrder(txtrUsername, 0);
-        txtrUsername.setEditable(false);
-        
-        JButton btnNewButton = new JButton("Login");
-        btnNewButton.setBounds(625, 550, 100, 25);
-        panel.add(btnNewButton);
-        btnNewButton.addActionListener(new ActionListener() {
+/*         // Actions for Login button
+        loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username = txtEnterUsername.getText();
                 String password = new String(txtEnterPassword.getPassword());
@@ -138,15 +170,23 @@ public class LoginScreen extends JFrame {
                     }
                 }
             }
-        });
-        contentPane.setComponentZOrder(btnNewButton, 0);
+        }); */
         
-        JTextArea txtrLogin = new JTextArea();
-        txtrLogin.setBackground(new Color(0, 0, 0, 1));
-        txtrLogin.setBounds(0, 0, 100, 100);
-        txtrLogin.setFont(new Font("Monospaced", Font.PLAIN, 30));
-        txtrLogin.setText("Login");
-        txtrLogin.setEditable(false);
-        panel.add(txtrLogin);
+
+        // Create a back button
+        JButton backButton = new JButton("Back");
+        backButton.setBounds((inputPanel.getWidth() - backButton.getPreferredSize().width) / 2, loginButton.getY() - backButton.getPreferredSize().height - 10, backButton.getPreferredSize().width, backButton.getPreferredSize().height);
+        inputPanel.add(backButton);
+
+        // Actions for Back button
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FirstScreen firstScreen = new FirstScreen();
+                firstScreen.setVisible(true);
+                dispose(); 
+            }
+        });
+
+        
 	}
 }
