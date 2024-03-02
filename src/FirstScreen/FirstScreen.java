@@ -45,7 +45,7 @@ public class FirstScreen extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("");
 		lblNewLabel.setIcon(new ImageIcon("SongScopeLogo.png"));
-		lblNewLabel.setBounds(0, 0, 662, 709);
+		lblNewLabel.setBounds(0, 0, 725, 800);
 		contentPane.add(lblNewLabel);
 		
 		 ImageIcon icon = new ImageIcon("SongScopeLogo.png");
@@ -56,7 +56,7 @@ public class FirstScreen extends JFrame {
 	        txtWelcomeBackTo.setBackground(new Color(176, 103, 125));
 	        txtWelcomeBackTo.setFont(new Font("Tahoma", Font.PLAIN, 25));
 	        txtWelcomeBackTo.setText("Welcome back to SongScope!");
-	        txtWelcomeBackTo.setBounds(820, 43, 347, 72);
+	        txtWelcomeBackTo.setBounds(1000, 43, 347, 72);
 	        contentPane.add(txtWelcomeBackTo);
 	        txtWelcomeBackTo.setColumns(10);
 	        txtWelcomeBackTo.setEditable(false);
@@ -71,7 +71,7 @@ public class FirstScreen extends JFrame {
 	                 dispose(); 
 	        	}
 	        });
-	        btnNewButton.setBounds(906, 450, 200, 50);
+	        btnNewButton.setBounds(1050, 450, 200, 50);
 	        contentPane.add(btnNewButton);
 	        
 	        JButton btnNewButton_1 = new JButton("Signup");
@@ -85,7 +85,7 @@ public class FirstScreen extends JFrame {
 	                 dispose(); 
 	        	}
 	        });
-	        btnNewButton_1.setBounds(906, 523, 200, 50);
+	        btnNewButton_1.setBounds(1050, 523, 200, 50);
 	        contentPane.add(btnNewButton_1);
 	}
 }
