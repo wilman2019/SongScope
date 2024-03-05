@@ -137,8 +137,7 @@ public class SearchScreen extends JFrame {
         picPanel.add(advancedSearchButton);
         picPanel.setComponentZOrder(advancedSearchButton, 0);
 
-
-
+        
 
 
         // Advanced Search Panel
@@ -174,11 +173,6 @@ public class SearchScreen extends JFrame {
             }
         });
 
-
-        JButton advancedSearchButton = new JButton("Advanced Search");
-
-
-        
 
 
 
