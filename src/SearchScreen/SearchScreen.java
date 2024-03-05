@@ -175,6 +175,8 @@ public class SearchScreen extends JFrame {
         });
 
 
+        JButton advancedSearchButton = new JButton("Advanced Search");
+
 
         
 
