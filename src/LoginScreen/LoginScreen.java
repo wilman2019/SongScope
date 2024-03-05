@@ -147,7 +147,7 @@ public class LoginScreen extends JFrame {
 
         
          // Actions for Login button
-        loginButton.addActionListener(new ActionListener() {
+        /* loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username = inputUsername.getText();
                 String password = new String(inputPassword.getPassword());
@@ -172,15 +172,15 @@ public class LoginScreen extends JFrame {
                     JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        }); 
+        }); */
         
-       /* loginButton.addActionListener(new ActionListener() {
+        loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	FirstScreen firstScreen = new FirstScreen();
             	firstScreen.setVisible(true);
             	dispose(); 
             }
-        }); */
+        }); 
         
 
         // Create a back button
