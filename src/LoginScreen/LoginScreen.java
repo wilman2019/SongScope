@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import FirstScreen.FirstScreen;
+import SearchScreen.SearchScreen;
 import SignupScreen.HandleSignup;
 import SignupScreen.HidePassword;
 import SignupScreen.SignupScreen;
@@ -79,6 +80,8 @@ public class LoginScreen extends JFrame {
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
         
+
+        
         // Allows picture to be resized with frame
         this.addComponentListener(new ComponentAdapter() {
             @Override
@@ -99,7 +102,7 @@ public class LoginScreen extends JFrame {
         inputPanel = new JPanel(); // Create new panel for Login section
 
         inputPanel.setBackground(new Color(255, 255, 255, 200));
-        inputPanel.setBounds(464, 89, 423, 515);
+        inputPanel.setBounds(600, 150, 423, 515);
         inputPanel.setOpaque(true);
         inputPanel.setLayout(null);
         picPanel.add(inputPanel);
@@ -140,16 +143,17 @@ public class LoginScreen extends JFrame {
 
         // Create a login button
         JButton loginButton = new JButton("Login");
-        loginButton.setBounds((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2, inputPanel.getHeight() - loginButton.getPreferredSize().height - 10, loginButton.getPreferredSize().width, loginButton.getPreferredSize().height);
+        loginButton.setBounds ((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2 - 12, middleY + 175, loginButton.getPreferredSize().width + 25, loginButton.getPreferredSize().height);
         inputPanel.add(loginButton);
+        inputPanel.setComponentZOrder(loginButton, 0);
 
 
         
-/*         // Actions for Login button
+/*          // Actions for Login button
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String username = txtEnterUsername.getText();
-                String password = new String(txtEnterPassword.getPassword());
+                String username = inputUsername.getText();
+                String password = new String(inputPassword.getPassword());
                 
                 if (HandleSignup.getSignUpMap().containsKey(username)) {
                     HandleSignup handleSignup = HandleSignup.getSignUpMap().get(username);
@@ -161,21 +165,30 @@ public class LoginScreen extends JFrame {
                                 FirstScreen firstScreen = new FirstScreen();
                                 firstScreen.setVisible(true);
                                 dispose(); 
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
                             }
                         } catch (NoSuchAlgorithmException ex) {
                             ex.printStackTrace();
                         }
                     }
                 }
+                else {
+                    JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-        }); */
+        });  */
+        
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	SearchScreen searchScreen = new SearchScreen();
+            	searchScreen.setVisible(true);
+            	dispose(); 
+            }
+        }); 
         
 
         // Create a back button
         JButton backButton = new JButton("Back");
-        backButton.setBounds((inputPanel.getWidth() - backButton.getPreferredSize().width) / 2, loginButton.getY() - backButton.getPreferredSize().height - 10, backButton.getPreferredSize().width, backButton.getPreferredSize().height);
+        backButton.setBounds((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2 - 12, middleY + 215, loginButton.getPreferredSize().width + 25, loginButton.getPreferredSize().height);
         inputPanel.add(backButton);
 
         // Actions for Back button

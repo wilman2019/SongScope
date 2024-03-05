@@ -4,6 +4,8 @@ import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +34,8 @@ public class SignupScreen extends JFrame {
 	private JTextField txtEnterUsername;
 	private JPasswordField txtEnterPassword;
 	private JTextField txtEnterEmail;
+	private JPanel picPanel;
+	private JPanel inputPanel;
 
 	/**
 	 * Launch the application.
@@ -53,100 +57,122 @@ public class SignupScreen extends JFrame {
 	 * Create the frame.
 	 */
 	public SignupScreen() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1354, 768);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel();
+		picPanel = new JPanel(); // Create new panel for Login section
+        picPanel.setBorder(new EmptyBorder(5, 5, 5, 5)); // Set border for panel
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program on close
+        setBounds(100, 100, 1354, 768); // Set size of frame
+        picPanel.setLayout(null);
+		
         ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
-        Image image = imageIcon.getImage().getScaledInstance(1230, 692, Image.SCALE_SMOOTH);
-        lblNewLabel.setIcon(new ImageIcon(image));
-        lblNewLabel.setBounds(10, 10, 1230, 692);
-        contentPane.add(lblNewLabel);
+        Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+        JLabel picLabel = new JLabel(new ImageIcon(image));
+        picPanel.add(picLabel);
         
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(255, 255, 255, 200));
-        panel.setBounds(464, 89, 423, 515);
-        panel.setOpaque(true);
-        contentPane.add(panel);
-        
-        contentPane.setComponentZOrder(panel, 0);
-        
-        JTextArea txtrPassword = new JTextArea();
-        txtrPassword.setBackground(new Color(0, 0, 0, 1));
-        txtrPassword.setBounds(500, 400, 100, 25);
-        txtrPassword.setText("Password");
-        panel.add(txtrPassword);
-        contentPane.setComponentZOrder(txtrPassword, 0);
-        txtrPassword.setEditable(false);
-        
-        txtEnterPassword = new JPasswordField();
-        txtEnterPassword.setBounds(500, 420, 100, 25);
-        panel.add(txtEnterPassword);
-        txtEnterPassword.setColumns(10);
-        contentPane.setComponentZOrder(txtEnterPassword, 0);
-        
-        txtEnterUsername = new JTextField();
-        txtEnterUsername.setBounds(500, 370, 100, 25);
-        panel.add(txtEnterUsername);
-        txtEnterUsername.setColumns(10);
-        contentPane.setComponentZOrder(txtEnterUsername, 0);
-        
-        JTextArea txtrEmail = new JTextArea();
-        txtrEmail.setBackground(new Color(0, 0, 0, 1));
-        txtrEmail.setBounds(500, 300, 100, 25);
-        txtrEmail.setText("Email");
-        panel.add(txtrEmail);
-        contentPane.setComponentZOrder(txtrEmail, 0);
-        txtrEmail.setEditable(false);
-        
-        txtEnterEmail = new JTextField();
-        txtEnterEmail.setBounds(500, 320, 100, 25);
-        panel.add(txtEnterEmail);
-        txtEnterEmail.setColumns(10);
-        contentPane.setComponentZOrder(txtEnterEmail, 0);
-        
-        JTextArea txtrUsername = new JTextArea();
-        panel.setBackground(new Color(255, 255, 255, 200));
-        txtrUsername.setBackground(new Color(0, 0, 0, 1));
-        txtrUsername.setBounds(500, 350, 100, 25);
-        txtrUsername.setText("Username");
-        panel.add(txtrUsername);
-        contentPane.setComponentZOrder(txtrUsername, 0);
-        txtrUsername.setEditable(false);
-        
-        JButton btnNewButton = new JButton("Signup");
-        btnNewButton.setBounds(625, 550, 100, 25);
-        panel.add(btnNewButton);
-        btnNewButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String username = txtEnterUsername.getText();
-                String password = new String(txtEnterPassword.getPassword());
-                String email = txtEnterEmail.getText();
-                HandleSignup signup = null;
-                try {
-                    signup = new HandleSignup(email, username, password);
-                    signup.addToHash(signup); 
-                } catch (NoSuchAlgorithmException | NullPointerException ex) {
-                    ex.printStackTrace();
-                }
-                FirstScreen firstScreen = new FirstScreen();
-                firstScreen.setVisible(true);
-                dispose();
+     // Allows picture to be resized with frame
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // Scale the image to the new size of the frame
+                Image newImage = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
+                picLabel.setIcon(new ImageIcon(newImage));
+
+                // fixes small bug where white area would show at top
+                picLabel.setBounds(0, 0, getWidth(), getHeight());
             }
         });
-        contentPane.setComponentZOrder(btnNewButton, 0);
         
-        JTextArea txtrLogin = new JTextArea();
-        txtrLogin.setBackground(new Color(0, 0, 0, 1));
-        txtrLogin.setBounds(0, 0, 100, 100);
-        txtrLogin.setFont(new Font("Monospaced", Font.PLAIN, 30));
-        txtrLogin.setText("Signup");
-        txtrLogin.setEditable(false);
-        panel.add(txtrLogin);
+        setContentPane(picPanel); // Set panel as content pane
+
+
+
+        inputPanel = new JPanel(); // Create new panel for Login section
+
+        inputPanel.setBackground(new Color(255, 255, 255, 200));
+        inputPanel.setBounds(600, 150, 423, 515);
+        inputPanel.setOpaque(true);
+        inputPanel.setLayout(null);
+        picPanel.add(inputPanel);
+        
+        picPanel.setComponentZOrder(inputPanel, 0);
+
+        // Create a JLabel for the title
+        JLabel lblTitle = new JLabel("Login");
+        lblTitle.setFont(new Font("Monospaced", Font.BOLD, 36));
+        lblTitle.setBounds((inputPanel.getWidth() - lblTitle.getPreferredSize().width) / 2, 10, lblTitle.getPreferredSize().width, lblTitle.getPreferredSize().height);
+        inputPanel.add(lblTitle);
+        
+        // Calculate the y-coordinate for the middle of the inputPanel
+        int middleY = inputPanel.getHeight() / 2;
+
+        // Create a JLabel for the username
+        JLabel lblUsername = new JLabel("Username:");
+        lblUsername.setBounds(10, middleY - 40, 100, 25);
+        inputPanel.add(lblUsername);
+        
+        // Create a JTextField for the username input
+        JTextField inputUsername = new JTextField();
+        inputUsername.setBounds(120, middleY - 40, 100, 25);
+        inputPanel.add(inputUsername);
+        
+     // Create a JLabel for the email
+        JLabel lblEmail = new JLabel("Email:");
+        lblEmail.setBounds(10, middleY, 100, 25);
+        inputPanel.add(lblEmail);
+        
+     // Create a JTextField for the email input
+        JTextField inputEmail = new JTextField();
+        inputEmail.setBounds(120, middleY, 100, 25);
+        inputPanel.add(inputEmail);
+
+        // Create a JLabel for the password
+        JLabel lblPassword = new JLabel("Password:");
+        lblPassword.setBounds(10, middleY + 40, 100, 25);
+        inputPanel.add(lblPassword);
+        
+        // Create a JPasswordField for the password input
+        JPasswordField inputPassword = new JPasswordField();
+        inputPassword.setBounds(120, middleY + 40, 100, 25);
+        inputPassword.setEchoChar('*');
+        inputPassword.setColumns(10);
+        inputPanel.add(inputPassword);
+        
+        // Create a signup button
+        JButton signupButton = new JButton("Signup");
+        signupButton.setBounds ((inputPanel.getWidth() - signupButton.getPreferredSize().width) / 2 - 12, middleY + 175, signupButton.getPreferredSize().width + 25, signupButton.getPreferredSize().height);
+        inputPanel.add(signupButton);
+        inputPanel.setComponentZOrder(signupButton, 0);
+        signupButton.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            String username = inputUsername.getText();
+	            String password = new String(inputPassword.getPassword());
+	            String email = inputEmail.getText();
+	            HandleSignup signup = null;
+	            try {
+	                signup = new HandleSignup(email, username, password);
+	                signup.addToHash(signup); 
+	            } catch (NoSuchAlgorithmException | NullPointerException ex) {
+	                ex.printStackTrace();
+	            }
+	            FirstScreen firstScreen = new FirstScreen();
+	            firstScreen.setVisible(true);
+	            dispose();
+	        }
+	    });
+        
+     // Create a back button
+        JButton backButton = new JButton("Back");
+        backButton.setBounds((inputPanel.getWidth() - signupButton.getPreferredSize().width) / 2 - 12, middleY + 215, signupButton.getPreferredSize().width + 25, signupButton.getPreferredSize().height);
+        inputPanel.add(backButton);
+
+        // Actions for Back button
+        backButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FirstScreen firstScreen = new FirstScreen();
+                firstScreen.setVisible(true);
+                dispose(); 
+            }
+        });
+        
 	}
 }
