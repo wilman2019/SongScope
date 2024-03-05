@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import FirstScreen.FirstScreen;
+import SearchScreen.SearchScreen;
 import SignupScreen.HandleSignup;
 import SignupScreen.HidePassword;
 import SignupScreen.SignupScreen;
@@ -78,6 +79,8 @@ public class LoginScreen extends JFrame {
         Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
+        
+
         
         // Allows picture to be resized with frame
         this.addComponentListener(new ComponentAdapter() {
@@ -146,8 +149,8 @@ public class LoginScreen extends JFrame {
 
 
         
-         // Actions for Login button
-        /* loginButton.addActionListener(new ActionListener() {
+/*          // Actions for Login button
+        loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String username = inputUsername.getText();
                 String password = new String(inputPassword.getPassword());
@@ -172,12 +175,12 @@ public class LoginScreen extends JFrame {
                     JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        }); */
+        });  */
         
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	FirstScreen firstScreen = new FirstScreen();
-            	firstScreen.setVisible(true);
+            	SearchScreen searchScreen = new SearchScreen();
+            	searchScreen.setVisible(true);
             	dispose(); 
             }
         }); 
