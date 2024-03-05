@@ -80,6 +80,8 @@ public class LoginScreen extends JFrame {
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
         
+
+        
         // Allows picture to be resized with frame
         this.addComponentListener(new ComponentAdapter() {
             @Override
