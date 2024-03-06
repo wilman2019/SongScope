@@ -2,7 +2,7 @@ package HandleCSV;
 
 public class TimSort {
 	public static void sortCSV() {
-		String[][] spotifyAndYoutubeData = CompleteStoreCSV.completeStoreSpotifyAndYoutubeCSV();
+		String[][] spotifyAndYoutubeData = CompleteStoreCSV.completeSpotifyAndYoutubeCSV();
 		String[][] topSpotifySongsData = CompleteStoreCSV.completeTopSpotifySongs();
 		
 		// Key is at index 28 for spotifyAndYoutubeData
@@ -24,17 +24,16 @@ public class TimSort {
         return n + r; 
     } 
   
-    public static void insertionSort(String[][] arr, int left, 
-                                     int right) 
+    public static void insertionSort(String[][] arr, int left, int right) 
     { 
         for (int i = left + 1; i <= right; i++) { 
-            String temp = arr[arr.length - 1][i]; 
+            String temp = arr[i][arr[1].length - 1]; 
             int j = i - 1; 
-            while (j >= left && arr[arr.length - 1][j].compareTo(temp) > 0) { 
-                arr[arr.length - 1][j + 1] = arr[arr.length - 1][j]; 
+            while (j >= left && arr[j][arr[1].length - 1].compareTo(temp) > 0) { 
+                arr[j + 1][arr[1].length - 1] = arr[j][arr[1].length - 1]; 
                 j--; 
             } 
-            arr[arr.length - 1][j + 1] = temp; 
+            arr[j + 1][arr[1].length - 1] = temp; 
         } 
     } 
   
@@ -44,10 +43,10 @@ public class TimSort {
         String[] left = new String[len1]; 
         String[] right = new String[len2]; 
         for (int x = 0; x < len1; x++) { 
-            left[x] = arr[arr.length - 1][l + x]; 
+            left[x] = arr[1 + x][arr[1].length - 1]; 
         } 
         for (int x = 0; x < len2; x++) { 
-            right[x] = arr[arr.length - 1][m + 1 + x]; 
+            right[x] = arr[m + 1 + x][arr[1].length - 1]; 
         } 
   
         int i = 0; 
@@ -56,24 +55,24 @@ public class TimSort {
   
         while (i < len1 && j < len2) { 
             if (left[i].compareTo(right[j]) <= 0) { 
-                arr[arr.length - 1][k] = left[i]; 
+                arr[k][arr[1].length - 1] = left[i]; 
                 i++; 
             } 
             else { 
-                arr[arr.length - 1][k] = right[j]; 
+                arr[k][arr[1].length - 1] = right[j]; 
                 j++; 
             } 
             k++; 
         } 
   
         while (i < len1) { 
-            arr[arr.length - 1][k] = left[i]; 
+            arr[k][arr[1].length - 1] = left[i]; 
             k++; 
             i++; 
         } 
   
         while (j < len2) { 
-            arr[arr.length - 1][k] = right[j]; 
+            arr[k][arr[1].length - 1] = right[j]; 
             k++; 
             j++; 
         } 
