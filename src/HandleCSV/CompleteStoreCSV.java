@@ -1,10 +1,10 @@
 package HandleCSV;
 
 public class CompleteStoreCSV {
-	public static String[][] completeStoreSpotifyAndYoutubeCSV() {
+	public static String[][] completeSpotifyAndYoutubeCSV() {
 		ReadCSV spotifyAndYoutube = new ReadCSV("Spotify_Youtube.csv");
 		
-		String[][] spotifyAndYoutubeData = spotifyAndYoutube.storeCSV();
+		String[][] spotifyAndYoutubeData = spotifyAndYoutube.storeCSVNonCSVFormat();
 		
 		// Add key to spotifyAndYoutubeData
 		for (int i = 0; i < spotifyAndYoutubeData.length; i++)
