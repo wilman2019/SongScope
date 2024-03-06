@@ -82,7 +82,7 @@ public class SearchScreen extends JFrame {
 
 
         // Background Image
-        ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
+        ImageIcon imageIcon = new ImageIcon("SongScopeSearch.png");
         Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);

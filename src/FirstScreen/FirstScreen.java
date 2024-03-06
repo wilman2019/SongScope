@@ -48,44 +48,44 @@ public class FirstScreen extends JFrame {
 		lblNewLabel.setBounds(0, 0, 725, 800);
 		contentPane.add(lblNewLabel);
 		
-		 ImageIcon icon = new ImageIcon("SongScopeLogo.png");
-	        Image image = icon.getImage().getScaledInstance(lblNewLabel.getWidth(), lblNewLabel.getHeight(), Image.SCALE_SMOOTH);
-	        lblNewLabel.setIcon(new ImageIcon(image));
-	        
-	        txtWelcomeBackTo = new JTextArea();
-	        txtWelcomeBackTo.setBackground(new Color(176, 103, 125));
-	        txtWelcomeBackTo.setFont(new Font("Tahoma", Font.PLAIN, 25));
-	        txtWelcomeBackTo.setText("Welcome back to SongScope!");
-	        txtWelcomeBackTo.setBounds(1000, 43, 347, 72);
-	        contentPane.add(txtWelcomeBackTo);
-	        txtWelcomeBackTo.setColumns(10);
-	        txtWelcomeBackTo.setEditable(false);
-	        
-	        JButton btnNewButton = new JButton("Login");
-	        btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 20));
-	        btnNewButton.setBackground(new Color(255, 255, 153));
-	        btnNewButton.addActionListener(new ActionListener() {
-	        	public void actionPerformed(ActionEvent e) {
-	        		 LoginScreen loginScreen = new LoginScreen();
-	                 loginScreen.setVisible(true);
-	                 dispose(); 
-	        	}
-	        });
-	        btnNewButton.setBounds(1050, 450, 200, 50);
-	        contentPane.add(btnNewButton);
-	        
-	        JButton btnNewButton_1 = new JButton("Signup");
-	        btnNewButton_1.setForeground(new Color(0, 0, 0));
-	        btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
-	        btnNewButton_1.setBackground(new Color(255, 255, 153));
-	        btnNewButton_1.addActionListener(new ActionListener() {
-	        	public void actionPerformed(ActionEvent e) {
-	        		SignupScreen signupScreen = new SignupScreen();
-	                 signupScreen.setVisible(true);
-	                 dispose(); 
-	        	}
-	        });
-	        btnNewButton_1.setBounds(1050, 523, 200, 50);
-	        contentPane.add(btnNewButton_1);
+		ImageIcon icon = new ImageIcon("SongScopeLogo.png");
+		Image image = icon.getImage().getScaledInstance(lblNewLabel.getWidth(), lblNewLabel.getHeight(), Image.SCALE_SMOOTH);
+		lblNewLabel.setIcon(new ImageIcon(image));
+		
+		txtWelcomeBackTo = new JTextArea();
+		txtWelcomeBackTo.setBackground(new Color(176, 103, 125));
+		txtWelcomeBackTo.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		txtWelcomeBackTo.setText("Welcome back to SongScope!");
+		txtWelcomeBackTo.setBounds(1000, 43, 347, 72);
+		contentPane.add(txtWelcomeBackTo);
+		txtWelcomeBackTo.setColumns(10);
+		txtWelcomeBackTo.setEditable(false);
+		
+		JButton btnNewButton = new JButton("Login");
+		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnNewButton.setBackground(new Color(255, 255, 153));
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					LoginScreen loginScreen = new LoginScreen();
+					loginScreen.setVisible(true);
+					dispose(); 
+			}
+		});
+		btnNewButton.setBounds(1050, 450, 200, 50);
+		contentPane.add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("Signup");
+		btnNewButton_1.setForeground(new Color(0, 0, 0));
+		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		btnNewButton_1.setBackground(new Color(255, 255, 153));
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				SignupScreen signupScreen = new SignupScreen();
+					signupScreen.setVisible(true);
+					dispose(); 
+			}
+		});
+		btnNewButton_1.setBounds(1050, 523, 200, 50);
+		contentPane.add(btnNewButton_1);
 	}
 }
