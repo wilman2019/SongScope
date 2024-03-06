@@ -9,11 +9,8 @@ import HandleCSV.TimSort;
 
 public class Main {
 	public static void main(String[] args) {
-		CompleteStoreCSV.completeStoreSpotifyAndYoutubeCSV();
-		CompleteStoreCSV.completeTopSpotifySongs();
-		String[][] spotifyAndYoutubeData = CompleteStoreCSV.completeStoreSpotifyAndYoutubeCSV();
+		String[][] spotifyAndYoutubeData = CompleteStoreCSV.completeSpotifyAndYoutubeCSV();
 		String[][] topSpotifySongsData = CompleteStoreCSV.completeTopSpotifySongs();
-		System.out.println(spotifyAndYoutubeData[100][1]);
 		int nSpotifyAndYoutubeData = spotifyAndYoutubeData.length;
 		int nTopSpotifySongsData = topSpotifySongsData.length;
 		TimSort.timSort(spotifyAndYoutubeData, nSpotifyAndYoutubeData);
