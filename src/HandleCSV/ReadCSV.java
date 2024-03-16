@@ -14,8 +14,8 @@ public class ReadCSV {
 		String file = CSVSource;
 		BufferedReader reader = null;
 		String line = "";
-		int rows = getRowCount();
-		int columns = getColumnCount();
+		int rows = getRowCountCSVFormat();
+		int columns = getColumnCountCSVFormat();
 		
 		// One added to columns so that key can be made in final column for each row
 		String[][] data = new String[rows][columns + 1];
@@ -24,7 +24,7 @@ public class ReadCSV {
 			reader = new BufferedReader(new FileReader(file));
 			int i = 0;
 			while((line = reader.readLine()) != null) {
-				 String[] row = line.split(",");
+				 String[] row = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				 for (int j = 0; j < columns && j < row.length; j++) {
 					 data[i][j] = row[j];
 				 }
@@ -42,8 +42,8 @@ public class ReadCSV {
 		String file = CSVSource;
 		BufferedReader reader = null;
 		String line = "";
-		int rows = getRowCount();
-		int columns = getColumnCount();
+		int rows = getRowCountNonCSVFormat();
+		int columns = getColumnCountNonCSVFormat();
 		
 		// One added to columns so that key can be made in final column for each row
 		String[][] data = new String[rows][columns + 1];
@@ -52,12 +52,12 @@ public class ReadCSV {
 			reader = new BufferedReader(new FileReader(file));
 			int i = 0;
 			while((line = reader.readLine()) != null) {
-				if (line.startsWith((i + 1) + ",")) {
-					 String[] row = line.split(",");
-					    for (int j = 0; j < columns && j < row.length; j++) {
-					        data[i][j] = row[j];
-					    }
-					    i++;
+				if (line.matches("\\d+,[^\\s].*")) {
+					String[] row = line.split(",(?=\\S)");
+					for (int j = 0; j < columns && j < row.length; j++) {
+						data[i][j] = "\"" + row[j] + "\"";
+					}
+					i++;
 				}
 				else
 					continue;
@@ -69,7 +69,28 @@ public class ReadCSV {
 		return data;
 	}
 	
-	public int getRowCount() {
+	public int getRowCountNonCSVFormat() {
+		String file = CSVSource;
+		BufferedReader reader = null;
+		String line = "";
+		int rowCount = 0;
+		
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			while((line = reader.readLine()) != null) {
+				if (line.matches("\\d+,[^\\s].*")) {
+	                rowCount++;
+	            }
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return rowCount;
+	}
+	
+	public int getRowCountCSVFormat() {
 		String file = CSVSource;
 		BufferedReader reader = null;
 		String line = "";
@@ -88,7 +109,28 @@ public class ReadCSV {
 		return rowCount;
 	}
 	
-	public int getColumnCount() {
+	public int getColumnCountNonCSVFormat() {
+		String file = CSVSource;
+		BufferedReader reader = null;
+		String line = "";
+		int columnCount = 0;
+		
+		try {
+			reader = new BufferedReader(new FileReader(file));
+			while((line = reader.readLine()) != null) {
+				String[] row = line.split(",(?=\\S)");
+				columnCount = row.length;
+				break;
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return columnCount;
+	}
+	
+	public int getColumnCountCSVFormat() {
 		String file = CSVSource;
 		BufferedReader reader = null;
 		String line = "";
