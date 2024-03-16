@@ -8,7 +8,7 @@ public class CompleteStoreCSV {
 		
 		// Add key to spotifyAndYoutubeData
 		for (int i = 0; i < spotifyAndYoutubeData.length; i++)
-			spotifyAndYoutubeData[i][spotifyAndYoutubeData[i].length - 1] = spotifyAndYoutubeData[i][11] + "-"+ spotifyAndYoutubeData[i][12];
+			spotifyAndYoutubeData[i][spotifyAndYoutubeData[i].length - 1] = spotifyAndYoutubeData[i][7] + " " + spotifyAndYoutubeData[i][8];
 		
 		return spotifyAndYoutubeData;
 	}
@@ -19,7 +19,7 @@ public class CompleteStoreCSV {
 		
 		// Add key to topSpotifySongs
 		for (int i = 0; i < topSpotifySongsData.length; i++)
-			topSpotifySongsData[i][topSpotifySongsData[i].length - 1] = topSpotifySongsData[i][16] + "-"+ topSpotifySongsData[i][18];
+			topSpotifySongsData[i][topSpotifySongsData[i].length - 1] = topSpotifySongsData[i][13] + " " + topSpotifySongsData[i][14];
 		
 		return topSpotifySongsData;
 	}
