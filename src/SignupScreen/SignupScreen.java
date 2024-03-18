@@ -129,36 +129,36 @@ public class SignupScreen extends JFrame {
 
         // Create a JLabel for the email
         lblEmail = new JLabel("Email:");
-        lblEmail.setBounds(10, middleY, 100, 25);
+        lblEmail.setBounds(10, middleY-40, 100, 25);
         inputPanel.add(lblEmail);
         
         // Create a JTextField for the email input
         inputEmail = new JTextField();
-        inputEmail.setBounds(120, middleY, 100, 25);
+        inputEmail.setBounds(120, middleY-40, 200, 25);
         inputPanel.add(inputEmail);
         
 
 
         // Create a JLabel for the username
         lblUsername = new JLabel("Username:");
-        lblUsername.setBounds(10, middleY - 40, 100, 25);
+        lblUsername.setBounds(10, middleY - 80, 100, 25);
         inputPanel.add(lblUsername);
         
         // Create a JTextField for the username input
         inputUsername = new JTextField();
-        inputUsername.setBounds(120, middleY - 40, 100, 25);
+        inputUsername.setBounds(120, middleY - 80, 200, 25);
         inputPanel.add(inputUsername);
         
         
 
         // Create a JLabel for the password
         lblPassword = new JLabel("Password:");
-        lblPassword.setBounds(10, middleY + 40, 100, 25);
+        lblPassword.setBounds(10, middleY , 100, 25);
         inputPanel.add(lblPassword);
         
         // Create a JPasswordField for the password input
         inputPassword = new JPasswordField();
-        inputPassword.setBounds(120, middleY + 40, 100, 25);
+        inputPassword.setBounds(120, middleY, 200, 25);
         inputPassword.setEchoChar('*');
         inputPanel.add(inputPassword);
         
