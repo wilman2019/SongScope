@@ -56,7 +56,7 @@ public class FirstScreen extends JFrame {
 		txtWelcomeBackTo.setBackground(new Color(176, 103, 125));
 		txtWelcomeBackTo.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtWelcomeBackTo.setText("Welcome back to SongScope!");
-		txtWelcomeBackTo.setBounds(1000, 43, 347, 72);
+		txtWelcomeBackTo.setBounds(850, 250, 347, 60);
 		contentPane.add(txtWelcomeBackTo);
 		txtWelcomeBackTo.setColumns(10);
 		txtWelcomeBackTo.setEditable(false);
@@ -71,7 +71,7 @@ public class FirstScreen extends JFrame {
 					dispose(); 
 			}
 		});
-		btnNewButton.setBounds(1050, 450, 200, 50);
+		btnNewButton.setBounds(920, 320, 200, 50);
 		contentPane.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("Signup");
@@ -85,7 +85,7 @@ public class FirstScreen extends JFrame {
 					dispose(); 
 			}
 		});
-		btnNewButton_1.setBounds(1050, 523, 200, 50);
+		btnNewButton_1.setBounds(920, 393, 200, 50);
 		contentPane.add(btnNewButton_1);
 	}
 }
