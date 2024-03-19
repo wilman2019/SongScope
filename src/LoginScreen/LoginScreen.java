@@ -126,7 +126,7 @@ public class LoginScreen extends JFrame {
 
         // Create a JTextField for the username input
         JTextField inputUsername = new JTextField();
-        inputUsername.setBounds(120, middleY - 40, 100, 25);
+        inputUsername.setBounds(120, middleY - 40, 200, 25);
         inputPanel.add(inputUsername);
 
         // Create a JLabel for the password
@@ -136,7 +136,7 @@ public class LoginScreen extends JFrame {
 
         // Create a JPasswordField for the password input
         JPasswordField inputPassword = new JPasswordField();
-        inputPassword.setBounds(120, middleY, 100, 25);
+        inputPassword.setBounds(120, middleY, 200, 25);
         inputPassword.setEchoChar('*');
         inputPassword.setColumns(10);
         inputPanel.add(inputPassword);
