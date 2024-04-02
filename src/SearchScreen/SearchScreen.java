@@ -14,6 +14,7 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -36,6 +37,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
+import javax.swing.JSlider;
 import javax.swing.JButton;
 
 public class SearchScreen extends JFrame {
@@ -47,7 +49,6 @@ public class SearchScreen extends JFrame {
     private JButton searchButton = new JButton("Search");
     private JButton advancedSearchButton = new JButton("Advanced Search");
     private JPanel advancedSearchPanel = new JPanel();
-
 
 
 
@@ -128,10 +129,12 @@ public class SearchScreen extends JFrame {
 
 
         // Advanced Search Button 
-        int advancedSearchWidth = 200;
+        int advancedSearchWidth = 180;
         int advancedSearchHeight = 25;
-        int advancedSearchX = searchX;
-        int advancedSearchY = searchY + searchHeight;
+        //int advancedSearchX = searchX;
+        int advancedSearchX = searchX - advancedSearchWidth;
+        //int advancedSearchY = searchY + searchHeight;
+        int advancedSearchY = searchY;
         advancedSearchButton.setBounds(advancedSearchX, advancedSearchY, advancedSearchWidth, advancedSearchHeight);
 
         picPanel.add(advancedSearchButton);
@@ -152,11 +155,168 @@ public class SearchScreen extends JFrame {
         int advancedSearchPanelWidth = advancedSearchWidth;
         advancedSearchPanel.setBounds(advancedSearchPanelX, advancedSearchPanelY, advancedSearchPanelWidth, advancedSearchPanelHeight);
 
+        // Advanced Search Panel Components
 
+        // artist name
+                // song name
+				// album name
+				// 8: Danceability
+				// 9: Energy
+				// 11: Loudness
+				// 12: Speechiness
+				// 13: Acousticness
+				// 14: Instrumentalness
+				// 15: Liveness
+				// 18: Duration_ms
+				// daily rank in country
+                // 37: popularity
+
+        // artist name
+        JLabel artistNameField = new JLabel("Artist Name");
+        artistNameField.setBounds(10, 10, 100, 25);
+        advancedSearchPanel.add(artistNameField);
+        JTextField artistName = new JTextField();
+        artistName.setBounds(120, 10, 200, 25);
+        advancedSearchPanel.add(artistName);
+
+        // song name
+        JLabel songNameField = new JLabel("Song Name");
+        songNameField.setBounds(10, 40, 100, 25);
+        advancedSearchPanel.add(songNameField);
+        JTextField songName = new JTextField();
+        songName.setBounds(120, 40, 200, 25);
+        advancedSearchPanel.add(songName);
+
+        // album name
+        JLabel albumNameField = new JLabel("Album Name");
+        albumNameField.setBounds(10, 70, 100, 25);
+        advancedSearchPanel.add(albumNameField);
+        JTextField albumName = new JTextField();
+        albumName.setBounds(120, 70, 200, 25);
+        advancedSearchPanel.add(albumName);
+
+        // danceability
+        JLabel danceabilityField = new JLabel("Danceability");
+        danceabilityField.setBounds(10, 100, 100, 25);
+        advancedSearchPanel.add(danceabilityField);
+
+        JTextField danceabilityMin = new JTextField();
+        danceabilityMin.setBounds(120, 100, 50, 25);
+        advancedSearchPanel.add(danceabilityMin);
+
+        JTextField danceabilityMax = new JTextField();
+        danceabilityMax.setBounds(180, 100, 50, 25);
+        advancedSearchPanel.add(danceabilityMax);
+
+
+        // energy
+        JLabel energyField = new JLabel("Energy");
+        energyField.setBounds(10, 130, 100, 25);
+        advancedSearchPanel.add(energyField);
+
+        JTextField energyMin = new JTextField();
+        energyMin.setBounds(120, 130, 50, 25);
+        advancedSearchPanel.add(energyMin);
+
+        JTextField energyMax = new JTextField();
+        energyMax.setBounds(180, 130, 50, 25);
+        advancedSearchPanel.add(energyMax);
+
+        // loudness
+        JLabel loudnessField = new JLabel("Loudness");
+        loudnessField.setBounds(10, 160, 100, 25);
+        advancedSearchPanel.add(loudnessField);
+
+        JTextField loudnessMin = new JTextField();
+        loudnessMin.setBounds(120, 160, 50, 25);
+        advancedSearchPanel.add(loudnessMin);
+
+        JTextField loudnessMax = new JTextField();
+        loudnessMax.setBounds(180, 160, 50, 25);
+        advancedSearchPanel.add(loudnessMax);
+
+        // speechiness
+        JLabel speechinessField = new JLabel("Speechiness");
+        speechinessField.setBounds(340, 10, 100, 25);
+        advancedSearchPanel.add(speechinessField);
+
+        JTextField speechinessMin = new JTextField();
+        speechinessMin.setBounds(450, 10, 50, 25);
+        advancedSearchPanel.add(speechinessMin);
+
+        JTextField speechinessMax = new JTextField();
+        speechinessMax.setBounds(510, 10, 50, 25);
+        advancedSearchPanel.add(speechinessMax);
+
+        // acousticness
+        JLabel acousticnessField = new JLabel("Acousticness");
+        acousticnessField.setBounds(340, 40, 100, 25);
+        advancedSearchPanel.add(acousticnessField);
+
+        JTextField acousticnessMin = new JTextField();
+        acousticnessMin.setBounds(450, 40, 50, 25);
+        advancedSearchPanel.add(acousticnessMin);
+
+        JTextField acousticnessMax = new JTextField();
+        acousticnessMax.setBounds(510, 40, 50, 25);
+        advancedSearchPanel.add(acousticnessMax);
+
+        // instrumentalness
+        JLabel instrumentalnessField = new JLabel("Instrumentalness");
+        instrumentalnessField.setBounds(340, 70, 100, 25);
+        advancedSearchPanel.add(instrumentalnessField);
+
+        JTextField instrumentalnessMin = new JTextField();
+        instrumentalnessMin.setBounds(450, 70, 50, 25);
+        advancedSearchPanel.add(instrumentalnessMin);
+
+        JTextField instrumentalnessMax = new JTextField();
+        instrumentalnessMax.setBounds(510, 70, 50, 25);
+        advancedSearchPanel.add(instrumentalnessMax);
+
+        // liveness
+        JLabel livenessField = new JLabel("Liveness");
+        livenessField.setBounds(340, 100, 100, 25);
+        advancedSearchPanel.add(livenessField);
+
+        JTextField livenessMin = new JTextField();
+        livenessMin.setBounds(450, 100, 50, 25);
+        advancedSearchPanel.add(livenessMin);
+
+        JTextField livenessMax = new JTextField();
+        livenessMax.setBounds(510, 100, 50, 25);
+        advancedSearchPanel.add(livenessMax);
+
+        // duration
+        JLabel durationField = new JLabel("Duration");
+        durationField.setBounds(340, 130, 100, 25);
+        advancedSearchPanel.add(durationField);
+
+        JTextField durationMin = new JTextField();
+        durationMin.setBounds(450, 130, 50, 25);
+        advancedSearchPanel.add(durationMin);
+        
+        JTextField durationMax = new JTextField();
+        durationMax.setBounds(510, 130, 50, 25);
+        advancedSearchPanel.add(durationMax);
+
+        // popularity
+        JLabel popularityField = new JLabel("Popularity");
+        popularityField.setBounds(340, 160, 100, 25);
+        advancedSearchPanel.add(popularityField);
+
+        JTextField popularityMin = new JTextField();
+        popularityMin.setBounds(450, 160, 50, 25);
+        advancedSearchPanel.add(popularityMin);
+
+        JTextField popularityMax = new JTextField();
+        popularityMax.setBounds(510, 160, 50, 25);
+        advancedSearchPanel.add(popularityMax);
+
+        
 
 
         picPanel.add(advancedSearchPanel);
-        
         picPanel.setComponentZOrder(advancedSearchPanel, 0);
 
 
@@ -200,10 +360,10 @@ public class SearchScreen extends JFrame {
                 searchButton.setBounds(x + searchWidth, y, 55, 50);
                 
                 // For advanced search button
-                advancedSearchButton.setBounds(x, y + searchHeight, 200, 25);
+                advancedSearchButton.setBounds(x, y + searchHeight, 180, 25);
 
                 // For advanced search panel
-                advancedSearchPanel.setBounds(x + 200, y + searchHeight, 550, 200);
+                advancedSearchPanel.setBounds(x + 180, y + searchHeight, 571, 200);
 
             }
         });
