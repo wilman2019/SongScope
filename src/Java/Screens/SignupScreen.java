@@ -1,4 +1,4 @@
-package Java.Screens;
+package Screens;
 
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -14,10 +14,6 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import Java.Screens.FirstScreen;
-import Java.Screens.LoginScreen;
-
 import javax.swing.JLabel;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -76,7 +72,7 @@ public class SignupScreen extends JFrame {
         picPanel.setLayout(null);
 		
         // Add background image
-        ImageIcon imageIcon = new ImageIcon("src/img/SongScope2.jpg");
+        ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
         Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
