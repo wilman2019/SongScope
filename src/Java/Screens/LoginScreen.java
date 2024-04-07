@@ -1,4 +1,4 @@
-package Java.Screens;
+package Screens;
 
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -12,13 +12,6 @@ import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import Java.Screens.FirstScreen;
-import Java.Screens.SearchScreen;
-import Java.Screens.HandleSignup;
-import Java.Screens.HidePassword;
-import Java.Screens.SignupScreen;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
@@ -75,7 +68,7 @@ public class LoginScreen extends JFrame {
         setBounds(100, 100, 1354, 768); // Set size of frame
         picPanel.setLayout(null);
                 
-        ImageIcon imageIcon = new ImageIcon("src/img/SongScope2.jpg");
+        ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
         Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
@@ -199,7 +192,6 @@ public class LoginScreen extends JFrame {
                 dispose(); 
             }
         });
-
 
         
 	}
