@@ -3,7 +3,7 @@ package Java.Screens;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import CombineCSV.CombineCSV;
+import Java.CombineCSV.CombineCSV;
 
 public class SimpleSearching {
 	public static void main(String[] args) {
