@@ -1,4 +1,4 @@
-package Screens;
+package Java.Screens;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
