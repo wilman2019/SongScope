@@ -1,4 +1,4 @@
-package Screens;
+package Java.Screens;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
