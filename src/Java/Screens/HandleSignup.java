@@ -1,4 +1,4 @@
-package Screens;
+package Java.Screens;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
