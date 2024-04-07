@@ -1,4 +1,4 @@
-package Java.Screens;
+package Screens;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
