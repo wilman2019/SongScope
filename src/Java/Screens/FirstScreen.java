@@ -1,4 +1,4 @@
-package Java.Screens;
+package Screens;
 
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -7,10 +7,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
-
-import Java.Screens.LoginScreen;
-import Java.Screens.SignupScreen;
-
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import java.awt.Color;
@@ -44,11 +40,11 @@ public class FirstScreen extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon("src/img/SongScopeLogo.png"));
+		lblNewLabel.setIcon(new ImageIcon("SongScopeLogo.png"));
 		lblNewLabel.setBounds(0, 0, 725, 800);
 		contentPane.add(lblNewLabel);
 		
-		ImageIcon icon = new ImageIcon("src/img/SongScopeLogo.png");
+		ImageIcon icon = new ImageIcon("SongScopeLogo.png");
 		Image image = icon.getImage().getScaledInstance(lblNewLabel.getWidth(), lblNewLabel.getHeight(), Image.SCALE_SMOOTH);
 		lblNewLabel.setIcon(new ImageIcon(image));
 		
