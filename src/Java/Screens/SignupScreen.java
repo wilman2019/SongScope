@@ -72,7 +72,7 @@ public class SignupScreen extends JFrame {
         picPanel.setLayout(null);
 		
         // Add background image
-        ImageIcon imageIcon = new ImageIcon("SongScope2.jpg");
+        ImageIcon imageIcon = new ImageIcon("src/img/SongScope2.jpg");
         Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
         JLabel picLabel = new JLabel(new ImageIcon(image));
         picPanel.add(picLabel);
