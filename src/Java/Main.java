@@ -12,6 +12,10 @@ public class Main {
 	public static void main(String[] args) {
 		String[][] songData = CombineCSV.combineCSV();
 		Java.Screens.SongData.setSongData(songData);
+		
+		String[][] topSongs = CompleteStoreCSV.completeTopSpotifySongs();
+		Java.Screens.TopSongs.setTopSongs(topSongs);
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
