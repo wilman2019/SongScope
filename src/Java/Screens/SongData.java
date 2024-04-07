@@ -1,4 +1,4 @@
-package Screens;
+package Java.Screens;
 
 public class SongData {
     private static String[][] songData;
