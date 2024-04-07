@@ -1,4 +1,4 @@
-package Java.Screens;
+package Screens;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -49,3 +49,4 @@ public class HandleSignup {
 		return password;
 	}
 }
+
