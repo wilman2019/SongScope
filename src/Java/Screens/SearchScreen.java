@@ -23,7 +23,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import Screens.Compare.CompareSongs;
+import Java.Screens.Compare.CompareSongs;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
