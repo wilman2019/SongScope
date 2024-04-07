@@ -370,7 +370,7 @@ public class SearchScreen extends JFrame {
                 JComboBox<String> countryBox = new JComboBox<>(countries);
                 JTextField dateField = new JTextField();
                 
-                String[][] topSpotifySongs = HandleCSV.CompleteStoreCSV.completeTopSpotifySongs();
+                String[][] topSpotifySongs = Java.HandleCSV.CompleteStoreCSV.completeTopSpotifySongs();
                 
                 JButton goButton = new JButton("Go");
                 
