@@ -40,11 +40,11 @@ public class FirstScreen extends JFrame {
 		contentPane.setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon("SongScopeLogo.png"));
+		lblNewLabel.setIcon(new ImageIcon("src/img/SongScopeLogo.png"));
 		lblNewLabel.setBounds(0, 0, 725, 800);
 		contentPane.add(lblNewLabel);
 		
-		ImageIcon icon = new ImageIcon("SongScopeLogo.png");
+		ImageIcon icon = new ImageIcon("src/img/SongScopeLogo.png");
 		Image image = icon.getImage().getScaledInstance(lblNewLabel.getWidth(), lblNewLabel.getHeight(), Image.SCALE_SMOOTH);
 		lblNewLabel.setIcon(new ImageIcon(image));
 		
