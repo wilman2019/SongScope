@@ -23,9 +23,14 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import Java.Screens.FirstScreen;
+import Java.Screens.HandleSignup;
+import Java.Screens.HidePassword;
+import Java.Screens.SignUpScreen;
 import Java.Screens.Compare.CompareSongs;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
 
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;

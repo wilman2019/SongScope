@@ -1,198 +1,326 @@
 package Java.Screens;
 
-import java.awt.EventQueue;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
+import Java.TextFields.TextField;
+import Java.TextFields.PasswordField;
+
+import javax.swing.UIManager;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import java.awt.Color;
-import javax.swing.JTextArea;
-import java.awt.Font;
-import java.awt.GridLayout;
-
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
+import javax.swing.JPanel;
 import javax.swing.JButton;
+
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
+import javax.swing.WindowConstants;
+import javax.swing.GroupLayout;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Dimension;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.security.NoSuchAlgorithmException;
+
+
 
 public class LoginScreen extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private JLabel appNameLabel;
+    private TextField emailText;
+    private JPanel imagePanel;
+    private JButton loginBtn;
+    private JLabel loginLabel;
+    private JPanel loginPanel;
+    private JPanel mainPanel;
+    private PasswordField passwordText;
+    private JButton signUpBtn;
+    private ImageIcon icon;
+    private JLabel iconLabel;
+    private JButton forgotPasswordBtn;
+    private JLabel incorrectPasswordLabel;
 
-    private JPanel contentPane; // delete this 
 
-	private JPanel picPanel;
-    private JPanel inputPanel;
-	private JTextField txtEnterUsername;
-	private JPasswordField txtEnterPassword;
-	private HashMap<String, HandleSignup> signupMap;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					LoginScreen frame = new LoginScreen();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-    
-    public LoginScreen(HashMap<String, HandleSignup> signupMap) {
-        this.signupMap = signupMap;
+    public LoginScreen() {
+        // Set Look and Feel for Buttons
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+                    e.printStackTrace();
+        }
+
+        // Initialize Components
+        initComponents();
     }
 
-	/**
-	 * Create the frame.
-	 */
-	public LoginScreen() {
-        
-        picPanel = new JPanel(); // Create new panel for Login section
-        picPanel.setBorder(new EmptyBorder(5, 5, 5, 5)); // Set border for panel
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Exit program on close
-        setBounds(100, 100, 1354, 768); // Set size of frame
-        picPanel.setLayout(null);
-                
-        ImageIcon imageIcon = new ImageIcon("src/img/SongScope2.jpg");
-        Image image = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-        JLabel picLabel = new JLabel(new ImageIcon(image));
-        picPanel.add(picLabel);
-        
+    private void initComponents() {
+        // Main Frame Settings
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Login");
+        setResizable(false);
 
-        
-        // Allows picture to be resized with frame
-        this.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                // Scale the image to the new size of the frame
-                Image newImage = imageIcon.getImage().getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-                picLabel.setIcon(new ImageIcon(newImage));
 
-                // fixes small bug where white area would show at top
-                picLabel.setBounds(0, 0, getWidth(), getHeight());
+        // Main Panel Settings
+        mainPanel = new JPanel();
+        mainPanel.setBackground(new Color(255, 255, 255));
+        mainPanel.setBounds(0, 0, 1000, 600);
+
+
+
+        // Image Panel Settings
+        imagePanel = new JPanel();
+        imagePanel.setBackground(new Color(21, 170, 180));
+        imagePanel.setPreferredSize(new Dimension(500, 600));
+
+        // Icon Settings
+        icon = new ImageIcon("src/img/Icon.png");
+        Image image = icon.getImage();
+        Image newImg = image.getScaledInstance(200, 200,  Image.SCALE_SMOOTH);
+        icon = new ImageIcon(newImg);
+        iconLabel = new JLabel(icon);
+        
+        // App Name Settings
+        appNameLabel = new JLabel();
+        appNameLabel.setFont(new Font("Showcard Gothic", 0, 24));
+        appNameLabel.setForeground(new Color(255, 255, 255));
+        appNameLabel.setText("SongScope");
+
+        // Login Panel Settings
+        loginPanel = new JPanel();
+        loginPanel.setBackground(new Color(255, 255, 255));
+        loginPanel.setPreferredSize(new Dimension(500, 600));
+
+        // Login Label Settings
+        loginLabel = new JLabel("Login");
+        loginLabel.setBackground(new Color(0, 102, 102));
+        loginLabel.setFont(new Font("Segoe UI", 1, 24));
+        
+        // Email Text Field Settings
+        emailText = new TextField();
+        emailText.setForeground(new Color(102, 102, 102));
+        emailText.setLabelText("Email");
+        
+        
+        // Password Text Field Settings
+        passwordText = new PasswordField();
+        passwordText.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
+        passwordText.setForeground(new Color(102, 102, 102));
+        passwordText.setLabelText("Password");
+
+
+        // Incorrect Password Label Settings
+        incorrectPasswordLabel = new JLabel(" ");
+        incorrectPasswordLabel.setFont(new Font("Segoe UI", 0, 14));
+        incorrectPasswordLabel.setForeground(new Color(255, 0, 0));
+        incorrectPasswordLabel.setHorizontalAlignment(JLabel.CENTER);
+
+
+
+
+        // Forgot Password Button Settings
+        forgotPasswordBtn = new JButton();
+        forgotPasswordBtn.setRolloverEnabled(false);
+        forgotPasswordBtn.setFocusPainted(false);
+        forgotPasswordBtn.setContentAreaFilled(false);
+        forgotPasswordBtn.setBorder(null);
+        forgotPasswordBtn.setText("Forgot Password?");
+        forgotPasswordBtn.setFont(new Font("Segoe UI", 0, 12));
+        forgotPasswordBtn.setForeground(new Color(0, 0, 0, 60));
+        forgotPasswordBtn.setHorizontalAlignment(JButton.LEFT);
+        forgotPasswordBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                forgotPasswordBtnActionPerformed(evt);
             }
         });
         
-        setContentPane(picPanel); // Set panel as content pane
-
-
-
-        inputPanel = new JPanel(); // Create new panel for Login section
-
-        inputPanel.setBackground(new Color(255, 255, 255, 200));
-        inputPanel.setBounds(600, 150, 423, 515);
-        inputPanel.setOpaque(true);
-        inputPanel.setLayout(null);
-        picPanel.add(inputPanel);
         
-        picPanel.setComponentZOrder(inputPanel, 0);
-
-        // Create a JLabel for the title
-        JLabel lblTitle = new JLabel("Login");
-        lblTitle.setFont(new Font("Monospaced", Font.BOLD, 36));
-        lblTitle.setBounds((inputPanel.getWidth() - lblTitle.getPreferredSize().width) / 2, 10, lblTitle.getPreferredSize().width, lblTitle.getPreferredSize().height);
-        inputPanel.add(lblTitle);
-
-
-        // Calculate the y-coordinate for the middle of the inputPanel
-        int middleY = inputPanel.getHeight() / 2;
-
-        // Create a JLabel for the username
-        JLabel lblUsername = new JLabel("Username:");
-        lblUsername.setBounds(10, middleY - 40, 100, 25);
-        inputPanel.add(lblUsername);
-
-        // Create a JTextField for the username input
-        JTextField inputUsername = new JTextField();
-        inputUsername.setBounds(120, middleY - 40, 200, 25);
-        inputPanel.add(inputUsername);
-
-        // Create a JLabel for the password
-        JLabel lblPassword = new JLabel("Password:");
-        lblPassword.setBounds(10, middleY, 100, 25);
-        inputPanel.add(lblPassword);
-
-        // Create a JPasswordField for the password input
-        JPasswordField inputPassword = new JPasswordField();
-        inputPassword.setBounds(120, middleY, 200, 25);
-        inputPassword.setEchoChar('*');
-        inputPassword.setColumns(10);
-        inputPanel.add(inputPassword);
-
-        // Create a login button
-        JButton loginButton = new JButton("Login");
-        loginButton.setBounds ((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2 - 12, middleY + 175, loginButton.getPreferredSize().width + 25, loginButton.getPreferredSize().height);
-        inputPanel.add(loginButton);
-        inputPanel.setComponentZOrder(loginButton, 0);
-
-
         
-/*          // Actions for Login button
-        loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String username = inputUsername.getText();
-                String password = new String(inputPassword.getPassword());
+
+        // Login Button Settings
+        loginBtn = new JButton();
+        loginBtn.setBackground(new Color(21, 170, 180));
+        loginBtn.setRolloverEnabled(false);
+        loginBtn.setFocusPainted(false);
+        loginBtn.setBorder(null);
+        loginBtn.setText("Login");
+        loginBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                loginBtnActionPerformed(evt);
+            }
+        });
+        
+
+
+        // Sign Up Button Settings
+        signUpBtn = new JButton("Don't have an account? Sign up");
+        signUpBtn.setBackground(new Color(21, 170, 180, 64));
+        signUpBtn.setRolloverEnabled(false);
+        signUpBtn.setFocusPainted(false);
+        signUpBtn.setBorder(null);
+        signUpBtn.setPreferredSize(new Dimension(250, 50));
+        signUpBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                signUpBtnActionPerformed(evt);
+            }
+        });
+
+
+
+
+        // Add main panel to the frame
+        getContentPane().add(mainPanel);
+
+
+
+        // Main Panel Layout
+        GroupLayout mainPanelLayout = new GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(mainPanelLayout.createSequentialGroup()
+                .addComponent(imagePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(loginPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addComponent(imagePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+            .addComponent(loginPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        );
+
+
+
+        // Image Panel Layout
+        GroupLayout imagePanelLayout = new GroupLayout(imagePanel);
+        imagePanel.setLayout(imagePanelLayout);
+        imagePanelLayout.setHorizontalGroup(
+            imagePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(imagePanelLayout.createSequentialGroup()
+                .addGap(152, 152, 152)
+                .addGroup(imagePanelLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                    .addComponent(iconLabel) 
+                    .addComponent(appNameLabel))
+                .addContainerGap(164, Short.MAX_VALUE))
+        );
+        imagePanelLayout.setVerticalGroup(
+            imagePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(GroupLayout.Alignment.TRAILING, imagePanelLayout.createSequentialGroup()
+                .addContainerGap(1, Short.MAX_VALUE)
+                .addComponent(iconLabel) 
+                .addGap(20)
+                .addComponent(appNameLabel)
+                .addContainerGap(100, Short.MAX_VALUE))
+        );
+
+
+
+        // Login Panel Layout
+        GroupLayout loginPanelLayout = new GroupLayout(loginPanel);
+        loginPanel.setLayout(loginPanelLayout);
+            loginPanelLayout.setHorizontalGroup(
+                loginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(loginPanelLayout.createSequentialGroup()
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE) // Add a gap before the components
+                    .addComponent(loginLabel)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)) // Add a gap after the components
+                .addGroup(loginPanelLayout.createSequentialGroup()
+                    .addGap(75) // Add a gap before the components
+                    .addGroup(loginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(emailText, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(passwordText, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(loginPanelLayout.createSequentialGroup() // Change the group here
+                            .addComponent(incorrectPasswordLabel, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(loginPanelLayout.createSequentialGroup()
+                            .addComponent(forgotPasswordBtn, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(loginBtn, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(signUpBtn, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE))
+                    .addGap(75)) // Add a gap after the components
+            );
+            loginPanelLayout.setVerticalGroup(
+                loginPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(loginPanelLayout.createSequentialGroup()
+                    .addGap(125)
+                    .addComponent(loginLabel)
+                    .addGap(25)
+                    .addComponent(emailText, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                    .addGap(30)
+                    .addComponent(passwordText, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(incorrectPasswordLabel, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+                    .addGap(10)
+                    .addGroup(loginPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(forgotPasswordBtn, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(loginBtn, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+                    .addGap(100)
+                    .addComponent(signUpBtn, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+                    .addGap(63))
+            );
+
+
+
+    
+        pack();
+    }
+
+
+    private void forgotPasswordBtnActionPerformed(ActionEvent evt) {
+        System.out.println("Forgot Password btn clicked");  
+        incorrectPasswordLabel.setText(" "); 
+    }
+
+    
+    private void loginBtnActionPerformed(ActionEvent evt) {
+        System.out.println("Login btn clicked");
+        incorrectPasswordLabel.setText("Incorrect Password!");
+
+
+        // get email and password from text fields
+        // search for email in database
+        // if email exists, get hashed password
+            // compare hashed password with hashed passwordText
+            // if password is correct, go to home page
+            // if password is incorrect, display "Incorrect Password!"
+        // if email doesn't exist, display "Incorrect Password!"
+
+
+        /* String username = inputUsername.getText();
+            String password = new String(inputPassword.getPassword());
+            
+            if (HandleSignup.getSignUpMap().containsKey(username)) {
+                HandleSignup handleSignup = HandleSignup.getSignUpMap().get(username);
                 
-                if (HandleSignup.getSignUpMap().containsKey(username)) {
-                    HandleSignup handleSignup = HandleSignup.getSignUpMap().get(username);
-                    
-                    if (handleSignup != null && handleSignup.getUsername().equals(username)) {
-                        try {
-                            String hashedEnteredPassword = HidePassword.cipherPassword(password);
-                            if (hashedEnteredPassword.equals(handleSignup.getPassword())) {
-                                FirstScreen firstScreen = new FirstScreen();
-                                firstScreen.setVisible(true);
-                                dispose(); 
-                            }
-                        } catch (NoSuchAlgorithmException ex) {
-                            ex.printStackTrace();
+                if (handleSignup != null && handleSignup.getUsername().equals(username)) {
+                    try {
+                        String hashedEnteredPassword = HidePassword.cipherPassword(password);
+                        if (hashedEnteredPassword.equals(handleSignup.getPassword())) {
+                            FirstScreen firstScreen = new FirstScreen();
+                            firstScreen.setVisible(true);
+                            dispose(); 
                         }
+                    } catch (NoSuchAlgorithmException ex) {
+                        ex.printStackTrace();
                     }
                 }
-                else {
-                    JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
-                }
             }
-        });  */
-        
-        loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	SearchScreen searchScreen = new SearchScreen();
-            	searchScreen.setVisible(true);
-            	dispose(); 
+            else {
+                JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }); 
-        
+            */
 
-        // Create a back button
-        JButton backButton = new JButton("Back");
-        backButton.setBounds((inputPanel.getWidth() - loginButton.getPreferredSize().width) / 2 - 12, middleY + 215, loginButton.getPreferredSize().width + 25, loginButton.getPreferredSize().height);
-        inputPanel.add(backButton);
 
-        // Actions for Back button
-        backButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                FirstScreen firstScreen = new FirstScreen();
-                firstScreen.setVisible(true);
-                dispose(); 
-            }
-        });
+    }
+    
+    
+    private void signUpBtnActionPerformed(ActionEvent evt) {
+        SignUpScreen SignUpFrame = new SignUpScreen();
+        SignUpFrame.setVisible(true);
+        SignUpFrame.pack();
+        SignUpFrame.setLocationRelativeTo(null); 
+        this.dispose();
+    }
 
-        
-	}
+
 }

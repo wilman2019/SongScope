@@ -3,7 +3,7 @@ package Java;
 import java.awt.EventQueue;
 
 import Java.CombineCSV.CombineCSV;
-import Java.Screens.FirstScreen;
+import Java.Screens.LoginScreen;
 import Java.HandleCSV.CompleteStoreCSV;
 import Java.HandleCSV.ReadCSV;
 import Java.HandleCSV.Sort;
@@ -19,8 +19,10 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					FirstScreen frame = new FirstScreen();
+					LoginScreen frame = new LoginScreen();
 					frame.setVisible(true);
+					frame.pack();
+					frame.setLocationRelativeTo(null);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

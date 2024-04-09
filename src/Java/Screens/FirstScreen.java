@@ -76,8 +76,8 @@ public class FirstScreen extends JFrame {
 		btnNewButton_1.setBackground(new Color(255, 255, 153));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SignupScreen signupScreen = new SignupScreen();
-					signupScreen.setVisible(true);
+				SignUpScreen signUpScreen = new SignUpScreen();
+					signUpScreen.setVisible(true);
 					dispose(); 
 			}
 		});
