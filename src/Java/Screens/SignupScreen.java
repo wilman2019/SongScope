@@ -281,11 +281,11 @@ public class SignUpScreen extends JFrame {
     private void SignUpBtnActionPerformed(ActionEvent evt) {
         System.out.println("Sign up btn clicked");
 
-        // tmp code to test the search screen
-        SearchScreen searchScreen = new SearchScreen();
-        searchScreen.setVisible(true);
-        searchScreen.pack();
-        searchScreen.setLocationRelativeTo(null);
+        // tmp code to test the home screen
+        MainScreen mainScreen = new MainScreen();
+        mainScreen.pack();
+        mainScreen.setVisible(true);
+        mainScreen.setLocationRelativeTo(null);
         this.dispose();
 
 
