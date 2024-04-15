@@ -122,14 +122,16 @@ public class LoginScreen extends JFrame {
 
 
         // Forgot Password Button Settings
-        forgotPasswordBtn = new JButton();
+        forgotPasswordBtn = new JButton("Forgot Password");
+        forgotPasswordBtn.setBackground(new Color(21,170,180,64));
         forgotPasswordBtn.setRolloverEnabled(false);
         forgotPasswordBtn.setFocusPainted(false);
         forgotPasswordBtn.setContentAreaFilled(false);
         forgotPasswordBtn.setBorder(null);
+        forgotPasswordBtn.setPreferredSize(new Dimension(250,50));
         forgotPasswordBtn.setText("Forgot Password?");
         forgotPasswordBtn.setFont(new Font("Segoe UI", 0, 12));
-        forgotPasswordBtn.setForeground(new Color(0, 0, 0, 60));
+        forgotPasswordBtn.setForeground(new Color(200, 50, 0, 60));
         forgotPasswordBtn.setHorizontalAlignment(JButton.LEFT);
         forgotPasswordBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -267,8 +269,13 @@ public class LoginScreen extends JFrame {
 
 
     private void forgotPasswordBtnActionPerformed(ActionEvent evt) {
-        System.out.println("Forgot Password btn clicked");  
-        incorrectPasswordLabel.setText(" "); 
+       // System.out.println("Forgot Password btn clicked");  
+       // incorrectPasswordLabel.setText(" "); 
+        ForgotPass ForgotPassFrame = new ForgotPass();
+        ForgotPassFrame.setVisible(true);
+        ForgotPassFrame.pack();
+        ForgotPassFrame.setLocationRelativeTo(null); 
+        this.dispose();
     }
 
     
@@ -323,4 +330,6 @@ public class LoginScreen extends JFrame {
     }
 
 
+
 }
+
