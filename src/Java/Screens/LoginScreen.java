@@ -122,12 +122,11 @@ public class LoginScreen extends JFrame {
 
 
         // Forgot Password Button Settings
-        forgotPasswordBtn = new JButton();
+        forgotPasswordBtn = new JButton("Forgot Password?");
         forgotPasswordBtn.setRolloverEnabled(false);
         forgotPasswordBtn.setFocusPainted(false);
         forgotPasswordBtn.setContentAreaFilled(false);
         forgotPasswordBtn.setBorder(null);
-        forgotPasswordBtn.setText("Forgot Password?");
         forgotPasswordBtn.setFont(new Font("Segoe UI", 0, 12));
         forgotPasswordBtn.setForeground(new Color(0, 0, 0, 60));
         forgotPasswordBtn.setHorizontalAlignment(JButton.LEFT);
@@ -267,8 +266,13 @@ public class LoginScreen extends JFrame {
 
 
     private void forgotPasswordBtnActionPerformed(ActionEvent evt) {
-        System.out.println("Forgot Password btn clicked");  
-        incorrectPasswordLabel.setText(" "); 
+       // System.out.println("Forgot Password btn clicked");  
+       // incorrectPasswordLabel.setText(" "); 
+        ForgotPass ForgotPassFrame = new ForgotPass();
+        ForgotPassFrame.setVisible(true);
+        ForgotPassFrame.pack();
+        ForgotPassFrame.setLocationRelativeTo(null); 
+        this.dispose();
     }
 
     
@@ -323,4 +327,6 @@ public class LoginScreen extends JFrame {
     }
 
 
+
 }
+
