@@ -1,7 +1,6 @@
 package Java.Screens;
 import Java.TextFields.PasswordField;
 import Java.TextFields.TextField;
-import javafx.scene.text.Text;
 
 import javax.swing.UIManager;
 
@@ -34,13 +33,13 @@ public class ForgotPass extends JFrame{
     private JButton resetBtn;
     private JLabel appNameLabel;
     private PasswordField confirmPasswordText;
-    private  JTextField emailText;
-    private  JPanel imagePanel;
-    public JButton loginBtn;
+    private TextField emailText;
+    private JPanel imagePanel;
+    private JButton loginBtn;
     private JPanel mainPanel;
     private PasswordField passwordText;
     private JPanel ForgotPasswordPanel;
-    private  JLabel ForgotPasswordLabel;
+    private JLabel ForgotPasswordLabel;
     private ImageIcon icon;
     private JLabel iconLabel;
     private JLabel incorrectPasswordLabel;
@@ -65,73 +64,73 @@ public class ForgotPass extends JFrame{
 
     //Main Panel Settings
         mainPanel = new JPanel();
-            mainPanel.setBackground(new Color(255, 255, 255));
-            mainPanel.setMinimumSize(new Dimension(1000, 600));
-            mainPanel.setPreferredSize(new Dimension(1000, 600));
+        mainPanel.setBackground(new Color(255, 255, 255));
+        mainPanel.setMinimumSize(new Dimension(1000, 600));
+        mainPanel.setPreferredSize(new Dimension(1000, 600));
 
     //Image Panel Settings
         imagePanel = new JPanel();
-            imagePanel.setBackground(new Color(21, 170, 180));
-            imagePanel.setMinimumSize(new Dimension(500, 600));
-            imagePanel.setPreferredSize(new Dimension(500, 600));
+        imagePanel.setBackground(new Color(21, 170, 180));
+        imagePanel.setMinimumSize(new Dimension(500, 600));
+        imagePanel.setPreferredSize(new Dimension(500, 600));
     
     //Icon settings
-            icon = new ImageIcon("src/img/Icon.png");
-            image = icon.getImage();
-            newImg = image.getScaledInstance(200, 200,  Image.SCALE_SMOOTH);
-            icon = new ImageIcon(newImg);
-            iconLabel = new JLabel(icon);
-    //App Name Label Settings
-            appNameLabel = new JLabel();
-            appNameLabel.setFont(new Font("Showcard Gothic", 0, 24)); // NOI18N
-            appNameLabel.setForeground(new Color(255, 255, 255));
-            appNameLabel.setText("SongScope");
+        icon = new ImageIcon("src/img/Icon.png");
+        image = icon.getImage();
+        newImg = image.getScaledInstance(200, 200,  Image.SCALE_SMOOTH);
+        icon = new ImageIcon(newImg);
+        iconLabel = new JLabel(icon);
+        //App Name Label Settings
+        appNameLabel = new JLabel();
+        appNameLabel.setFont(new Font("Showcard Gothic", 0, 24)); // NOI18N
+        appNameLabel.setForeground(new Color(255, 255, 255));
+        appNameLabel.setText("SongScope");
 
         //Forgot Password Panel Settings
-            ForgotPasswordPanel= new JPanel();
-            ForgotPasswordPanel.setBackground(new Color(255, 255,255));
-            ForgotPasswordPanel.setMinimumSize(new Dimension(500,600));
-            ForgotPasswordPanel.setPreferredSize(new Dimension(500,600));
+        ForgotPasswordPanel= new JPanel();
+        ForgotPasswordPanel.setBackground(new Color(255, 255,255));
+        ForgotPasswordPanel.setPreferredSize(new Dimension(500,600));
+
         //Forgot Password Label Settings
-            ForgotPasswordLabel= new JLabel("Forgot Password");
-            ForgotPasswordLabel.setBackground(new Color(0,102,102));
-            ForgotPasswordLabel.setFont(new Font("Segoe UI",1,24));
+        ForgotPasswordLabel= new JLabel("Forgot Password");
+        ForgotPasswordLabel.setBackground(new Color(0,102,102));
+        ForgotPasswordLabel.setFont(new Font("Segoe UI",1,24));
     
         //Email Text Settings
         emailText= new TextField();
-            emailText.setForeground(new Color(102,102,102));
-            //emailText.setLabelText("Email");
+        emailText.setForeground(new Color(102,102,102));
+        emailText.setLabelText("Email");
         
         //Email Label Settings
         emailLabel= new JLabel("registered email address");
-            emailLabel.setBackground(new Color(0,102,102));
-            emailLabel.setFont(new Font("Segoe UI",1, 24));
+        emailLabel.setBackground(new Color(0,102,102));
+        emailLabel.setFont(new Font("Segoe UI",1, 24));
         //Reset Btn Settings
-            resetBtn= new JButton("Reset Password");
-            resetBtn.setBackground(new Color(21, 170, 180));
-            resetBtn.setBorder(null);
-            resetBtn.setRolloverEnabled(false);
-            resetBtn.setFocusPainted(false);
-            resetBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    forgotPasswordBtnActionPerformed(evt);
-                }
+        resetBtn= new JButton("Reset Password");
+        resetBtn.setBackground(new Color(21, 170, 180));
+        resetBtn.setBorder(null);
+        resetBtn.setRolloverEnabled(false);
+        resetBtn.setFocusPainted(false);
+        resetBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                forgotPasswordBtnActionPerformed(evt);
+            }
             });
         //Return to Login Settings
-            loginBtn = new JButton("Remember Password? Login");
-            loginBtn.setBackground(new Color(21, 170, 180, 64));
-            loginBtn.setRolloverEnabled(false);
-            loginBtn.setFocusPainted(false);
-            loginBtn.setBorder(null);
-            loginBtn.setPreferredSize(new Dimension(250, 50));
-            loginBtn.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt) {
-                    loginBtnActionPerformed(evt);
-                }
+        loginBtn = new JButton("Remember Password? Login");
+        loginBtn.setBackground(new Color(21, 170, 180, 64));
+        loginBtn.setRolloverEnabled(false);
+        loginBtn.setFocusPainted(false);
+        loginBtn.setBorder(null);
+        loginBtn.setPreferredSize(new Dimension(250, 50));
+        loginBtn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                loginBtnActionPerformed(evt);
+            }
             });
             
     
-            getContentPane().add(mainPanel);
+        getContentPane().add(mainPanel);
     
         //Main Panel Layout
         GroupLayout mainPanelLayout= new GroupLayout(mainPanel);
@@ -190,11 +189,11 @@ public class ForgotPass extends JFrame{
             ForgotPassPanelLayout.setVerticalGroup(
                 ForgotPassPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addGroup(ForgotPassPanelLayout.createSequentialGroup()
-                    .addGap(55)
+                    .addGap(125)
                     .addComponent(ForgotPasswordLabel)
                     .addGap(25)
                     .addComponent(emailText, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-                    .addGap(3)
+                    .addGap(40)
                     .addComponent(resetBtn, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                     .addGap(30)
                     .addComponent(loginBtn, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
