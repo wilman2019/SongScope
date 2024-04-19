@@ -2,6 +2,7 @@ package Java.Screens;
 
 import Java.TextFields.PasswordField;
 import Java.TextFields.TextField;
+import Java.Database.DatabaseManager;
 
 import javax.swing.UIManager;
 
@@ -22,7 +23,13 @@ import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.NoSuchAlgorithmException;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.apache.commons.validator.routines.EmailValidator;
 
 
 
@@ -44,6 +51,8 @@ public class SignUpScreen extends JFrame {
     private TextField nameText;
     private Image image;
     private Image newImg;
+    private Connection connection;
+
 
 
 
@@ -54,6 +63,9 @@ public class SignUpScreen extends JFrame {
         } catch (Exception e) {
                     e.printStackTrace();
         }
+
+        connection = DatabaseManager.getConnection();
+
 
         // Initialize Components
         initComponents();
@@ -127,12 +139,14 @@ public class SignUpScreen extends JFrame {
         passwordText = new PasswordField();
         passwordText.setForeground(new Color(102, 102, 102));
         passwordText.setLabelText("Password");
+        passwordText.setShowAndHide(true);
 
 
         // Confirm Password Settings
         confirmPasswordText = new PasswordField();
         confirmPasswordText.setForeground(new Color(102, 102, 102));
         confirmPasswordText.setLabelText("Confirm Password");
+        confirmPasswordText.setShowAndHide(true);
 
 
         // Incorrect Password Label Settings
@@ -279,46 +293,107 @@ public class SignUpScreen extends JFrame {
     }
 
     private void SignUpBtnActionPerformed(ActionEvent evt) {
-        System.out.println("Sign up btn clicked");
-
-        // tmp code to test the home screen
-        MainScreen mainScreen = new MainScreen();
-        mainScreen.pack();
-        mainScreen.setVisible(true);
-        mainScreen.setLocationRelativeTo(null);
-        this.dispose();
-
-
-
 
         // get all the text from the fields
         // hash password ad confirm password with BCrypt
+        String name = nameText.getText();
         String email = emailText.getText();
         String password = new String(passwordText.getPassword());
         String confirmPassword = new String(confirmPasswordText.getPassword());
 
-        // check if email is valid
-        if (email.contains("@") && email.contains(".")) {
-            // if email is valid, check if it is already in the database
-                // if it is not in the database, save it to the database
-                // if it is in the database, set text to "Email already exists"
-        } else {
-            // if email is not valid, set text to "Invalid email"
-        }
+        // check if email is valid and if password and confirm password match
+        if (areInputsValid(name, email, password, confirmPassword) && !isEmailInDatabase(email)) {
+            // fields are valid and not in database, insert new user
+            String sql = "INSERT INTO user(email, username, password) VALUES(?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setString(1, email);
+                stmt.setString(2, name);
+                stmt.setString(3, password);
+                DatabaseManager.update(stmt);
+                connection.close();
 
-        // check if the password and confirm password match
-        if (password.equals(confirmPassword)) {
-            // if they match, hash the password and save it to the database
-            incorrectPasswordLabel.setText(" ");
-        } else {
-            // if they don't match, show an error message
-            incorrectPasswordLabel.setText("Passwords do not match!");
-        }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
 
-        // if email is valid and password and confirm password match, save the data to the database
 
+            // open the login screen
+            MainScreen mainFrame = new MainScreen(email);
+            mainFrame.setVisible(true);
+            mainFrame.pack();
+            mainFrame.setLocationRelativeTo(null);
+            this.dispose();
+
+        } else if (isEmailInDatabase(email)) {
+            // email is in database
+            incorrectPasswordLabel.setText("Email already exists");
+        } else if (!password.equals(confirmPassword)) {
+            // passwords do not match
+            incorrectPasswordLabel.setText("Passwords do not match");
+        } 
     }
 
 
+    private boolean isEmailInDatabase(String email) {
+        ResultSet result = DatabaseManager.query("SELECT * FROM user WHERE email = '" + email + "'");
+
+        try {
+            if (result.next()) {
+                incorrectPasswordLabel.setText("Email already exists");
+                return true;
+            }
+    
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return false;
+    }
+
+    private boolean areInputsValid(String name, String email, String password, String confirmPassword) {
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            incorrectPasswordLabel.setText("Please fill in all fields");
+            return false;
+        }
+    
+        if (!EmailValidator.getInstance().isValid(email)) {
+            incorrectPasswordLabel.setText("Invalid email");
+            return false;
+        }
+    
+        if (!arePasswordsValid(password, confirmPassword)) {
+            return false;
+        }
+    
+        return true;
+    }
+
+    private boolean arePasswordsValid(String password, String confirmPassword) {
+        if (!password.equals(confirmPassword)) {
+            incorrectPasswordLabel.setText("Passwords do not match");
+            return false;
+        }
+
+        // regex for password having at least 1 uppercase, 1 digit, 8 characters
+        String regex = "^(?=.*[0-9])(?=.*[A-Z]).{8,}$";
+        if (!password.matches(regex)) {
+            incorrectPasswordLabel.setText("Password needs 1 uppercase, 1 digit, 8 characters");
+            return false;
+        }
+
+    
+        return true;
+    }
+
+
+
+
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        // Close the database connection when the frame is disposed
+        DatabaseManager.closeConnection();
+    }
 
 }

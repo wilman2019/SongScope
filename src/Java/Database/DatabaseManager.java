@@ -2,6 +2,8 @@ package Java.Database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -37,4 +39,33 @@ public class DatabaseManager {
             e.printStackTrace();
         }
     }
+
+    // Method to query the database and return results
+    public static ResultSet query(String query) {
+        try {
+            connection = getConnection();
+            ResultSet result = connection.createStatement().executeQuery(query);
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Method to insert/delete/update into the database
+    public static void update(PreparedStatement stmt) {
+        try {
+            connection = getConnection();
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
 }

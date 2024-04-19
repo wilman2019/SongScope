@@ -107,9 +107,9 @@ public class LoginScreen extends JFrame {
         
         // Password Text Field Settings
         passwordText = new PasswordField();
-        passwordText.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         passwordText.setForeground(new Color(102, 102, 102));
         passwordText.setLabelText("Password");
+        passwordText.setShowAndHide(true);
 
 
         // Incorrect Password Label Settings

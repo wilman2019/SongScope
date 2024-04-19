@@ -62,7 +62,7 @@ public class PasswordField extends JPasswordField {
     private boolean showAndHide;
 
     public PasswordField() {
-        setBorder(new EmptyBorder(20, 3, 10, 30));
+        setBorder(new EmptyBorder(20, 3, 5, 30));
         setSelectionColor(new Color(76, 204, 255));
         addMouseListener(new MouseAdapter() {
             @Override
