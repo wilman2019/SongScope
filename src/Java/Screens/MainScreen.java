@@ -60,13 +60,15 @@ public class MainScreen extends JFrame {
 
 
     // Main Constructor
-    public MainScreen() {
+    public MainScreen(String email) {
         // Set Look and Feel for Buttons
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         } catch (Exception e) {
                     e.printStackTrace();
         }
+
+        
 
         // Initialize Components
         initComponents();

@@ -216,7 +216,7 @@ private void loginBtnActionPerformed(ActionEvent evt) {
 private void forgotPasswordBtnActionPerformed(ActionEvent evt){
     System.out.println("reset password btn clicked");
 
-    MainScreen mainScreen = new MainScreen();
+    MainScreen mainScreen = new MainScreen(null);
         mainScreen.pack();
         mainScreen.setVisible(true);
         mainScreen.setLocationRelativeTo(null);
