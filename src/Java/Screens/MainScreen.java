@@ -27,12 +27,19 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+
+import Java.Database.DatabaseManager;
+
 
 
 public class MainScreen extends JFrame {
@@ -57,6 +64,8 @@ public class MainScreen extends JFrame {
     private ImageIcon blankIcon;
     private ImageIcon settingsIcon;
     private ImageIcon songStatsIcon;
+    private Connection connection;
+    private String userName;
 
 
     // Main Constructor
@@ -68,7 +77,10 @@ public class MainScreen extends JFrame {
                     e.printStackTrace();
         }
 
-        
+        // Get User Name
+        connection = DatabaseManager.getConnection();
+        userName = getUserName(email);
+
 
         // Initialize Components
         initComponents();
@@ -99,7 +111,7 @@ public class MainScreen extends JFrame {
         welcomeLabel.setForeground(new Color(255,255,255));
 
         // Name Label (Name of user will be changed to variabel later)
-        nameLabel = new JLabel("Colin!");
+        nameLabel = new JLabel(userName + "!");
         nameLabel.setFont(new Font("Helvetica Neue", 0, 24));
         nameLabel.setForeground(new Color(255,255,255));
         nameLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -454,6 +466,24 @@ public class MainScreen extends JFrame {
 
         // Pack and set location of frame
         pack();
+    }
+
+
+
+    // Get user id
+    public String getUserName(String email) {
+        String query = "SELECT name FROM user WHERE email = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, email);
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

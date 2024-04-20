@@ -2,12 +2,13 @@ package Java.Screens;
 
 import Java.TextFields.TextField;
 import Java.TextFields.PasswordField;
+import Java.Database.DatabaseManager;
+
 
 import javax.swing.UIManager;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 
@@ -23,7 +24,15 @@ import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.NoSuchAlgorithmException;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.apache.commons.validator.routines.EmailValidator;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 
 
@@ -42,6 +51,7 @@ public class LoginScreen extends JFrame {
     private JLabel iconLabel;
     private JButton forgotPasswordBtn;
     private JLabel incorrectPasswordLabel;
+    private Connection connection;
 
 
 
@@ -52,6 +62,8 @@ public class LoginScreen extends JFrame {
         } catch (Exception e) {
                     e.printStackTrace();
         }
+
+        connection = DatabaseManager.getConnection();
 
         // Initialize Components
         initComponents();
@@ -274,50 +286,78 @@ public class LoginScreen extends JFrame {
         ForgotPassFrame.setLocationRelativeTo(null); 
         this.dispose();
     }
-
     
     private void loginBtnActionPerformed(ActionEvent evt) {
-        System.out.println("Login btn clicked");
-        incorrectPasswordLabel.setText("Incorrect Password!");
-
 
         // get email and password from text fields
-        // search for email in database
-        // if email exists, get hashed password
-            // compare hashed password with hashed passwordText
-            // if password is correct, go to home page
-            // if password is incorrect, display "Incorrect Password!"
-        // if email doesn't exist, display "Incorrect Password!"
+        String email = emailText.getText();
+        email = email.toLowerCase();
+        String password = new String(passwordText.getPassword());
 
-
-        /* String username = inputUsername.getText();
-            String password = new String(inputPassword.getPassword());
-            
-            if (HandleSignup.getSignUpMap().containsKey(username)) {
-                HandleSignup handleSignup = HandleSignup.getSignUpMap().get(username);
-                
-                if (handleSignup != null && handleSignup.getUsername().equals(username)) {
-                    try {
-                        String hashedEnteredPassword = HidePassword.cipherPassword(password);
-                        if (hashedEnteredPassword.equals(handleSignup.getPassword())) {
-                            FirstScreen firstScreen = new FirstScreen();
-                            firstScreen.setVisible(true);
-                            dispose(); 
+        // check if email is valid
+        if (EmailValidator.getInstance().isValid(email)) {
+            // email is valid, check if email is in database
+            if (isEmailInDatabase(email)) {
+                // email exists, get hashed password
+                try {
+                    String sql = "SELECT password FROM user WHERE email = ?";
+                    PreparedStatement stmt = connection.prepareStatement(sql);
+                    stmt.setString(1, email);
+                    ResultSet result = stmt.executeQuery();
+                    
+                    if (result.next()) {
+                        String hashedPassword = result.getString("password");
+                    
+                        // compare hashed password with hashed passwordText
+                        if (BCrypt.checkpw(password, hashedPassword)) {
+                            // if password is correct, go to home page
+                            MainScreen mainScreen = new MainScreen(email);
+                            mainScreen.setVisible(true);
+                            mainScreen.pack();
+                            mainScreen.setLocationRelativeTo(null);
+                            dispose();
+                        } else {
+                            // if password is incorrect, display "Incorrect Password!"
+                            incorrectPasswordLabel.setText("Incorrect Password!");
                         }
-                    } catch (NoSuchAlgorithmException ex) {
-                        ex.printStackTrace();
+                    } else {
+                        // email does not exist
+                        incorrectPasswordLabel.setText("Email does not exist");
                     }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+            } else {
+                // email does not exist
+                incorrectPasswordLabel.setText("Email does not exist");
             }
-            else {
-                JOptionPane.showMessageDialog(null, "Incorrect password", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-            */
 
 
+        } else {
+            // email is not valid
+            incorrectPasswordLabel.setText("Invalid Email");
+        }
     }
     
-    
+    private boolean isEmailInDatabase(String email) {
+
+        try {
+            String sql = "SELECT email FROM user WHERE email = ?";
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, email);
+            ResultSet result = stmt.executeQuery();
+
+            if (result.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private void signUpBtnActionPerformed(ActionEvent evt) {
         SignUpScreen SignUpFrame = new SignUpScreen();
         SignUpFrame.setVisible(true);

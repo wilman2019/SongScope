@@ -41,11 +41,9 @@ public class DatabaseManager {
     }
 
     // Method to query the database and return results
-    public static ResultSet query(String query) {
+    public static ResultSet query(PreparedStatement query) {
         try {
-            connection = getConnection();
-            ResultSet result = connection.createStatement().executeQuery(query);
-            return result;
+            return query.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
