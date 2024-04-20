@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.mindrot.jbcrypt.BCrypt;
 
 
 
@@ -298,19 +299,22 @@ public class SignUpScreen extends JFrame {
         // hash password ad confirm password with BCrypt
         String name = nameText.getText();
         String email = emailText.getText();
+        email = email.toLowerCase();
         String password = new String(passwordText.getPassword());
         String confirmPassword = new String(confirmPasswordText.getPassword());
+
 
         // check if email is valid and if password and confirm password match
         if (areInputsValid(name, email, password, confirmPassword) && !isEmailInDatabase(email)) {
             // fields are valid and not in database, insert new user
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
             String sql = "INSERT INTO user(email, username, password) VALUES(?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, email);
                 stmt.setString(2, name);
-                stmt.setString(3, password);
+                stmt.setString(3, hashedPassword);
                 DatabaseManager.update(stmt);
-                connection.close();
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -333,18 +337,32 @@ public class SignUpScreen extends JFrame {
         } 
     }
 
-
     private boolean isEmailInDatabase(String email) {
-        ResultSet result = DatabaseManager.query("SELECT * FROM user WHERE email = '" + email + "'");
-
-        try {
+        // create a query to check if the email is in the database
+        String sql = "SELECT * FROM user WHERE email = ?";
+        ResultSet result = null;
+        
+        // execute the query
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            result = stmt.executeQuery();
+            
+            // if we get a result, the email is in the database
             if (result.next()) {
                 incorrectPasswordLabel.setText("Email already exists");
                 return true;
             }
-    
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            // close the result set
+            if (result != null) {
+                try {
+                    result.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     
         return false;
@@ -385,15 +403,5 @@ public class SignUpScreen extends JFrame {
         return true;
     }
 
-
-
-
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        // Close the database connection when the frame is disposed
-        DatabaseManager.closeConnection();
-    }
 
 }
