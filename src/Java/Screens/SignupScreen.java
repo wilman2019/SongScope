@@ -309,7 +309,7 @@ public class SignUpScreen extends JFrame {
             // fields are valid and not in database, insert new user
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
-            String sql = "INSERT INTO user(email, username, password) VALUES(?, ?, ?)";
+            String sql = "INSERT INTO user(email, name, password) VALUES(?, ?, ?)";
             try (PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.setString(1, email);
                 stmt.setString(2, name);

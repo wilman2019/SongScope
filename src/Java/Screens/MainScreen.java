@@ -2,7 +2,7 @@ package Java.Screens;
 
 import Java.TextFields.TextField;
 import Java.TextFields.PasswordField;
-
+import Java.TextFields.SearchField;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -438,6 +438,23 @@ public class MainScreen extends JFrame {
         // Search panel
         JPanel searchPanel = new JPanel();
         searchPanel.setBackground(new Color(255, 204, 204)); 
+
+
+        // 
+        SearchField searchField = new SearchField();
+        searchField.setPreferredSize(new Dimension(300, 30));
+        searchField.setShowAndHide(true);
+
+
+        searchPanel.add(searchField);
+
+
+        
+        
+
+
+
+
         
         // Map panel
         JPanel mapPanel = new JPanel();
@@ -486,4 +503,14 @@ public class MainScreen extends JFrame {
         return null;
     }
 
+
+
+
+    public static void main(String[] args) {
+        MainScreen test = new MainScreen(null);
+        test.setVisible(true);
+        test.setLocationRelativeTo(null);
+        
+        
+    }
 }
