@@ -6,6 +6,14 @@
   
   <dependencies>
 
+  	<dependency>
+  		<groupId>com.kenai.nbpwr</groupId>
+  		<artifactId>org-jdesktop-animation-timing</artifactId>
+  		<version>1.0-201002281504</version>
+  		<type>nbm</type>
+  	</dependency>
+
+
 	<dependency>
     	<groupId>commons-validator</groupId>
     	<artifactId>commons-validator</artifactId>
@@ -78,11 +86,6 @@
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
         <!-- Add more dependencies as needed -->
-	<dependency>
-        <groupId>org.jdesktop</groupId>
-        <artifactId>animation</artifactId>
-        <version>1.0</version>
-    </dependency>
 
 	
 
