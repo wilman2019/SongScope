@@ -77,6 +77,8 @@ public class MainScreen extends JFrame {
     private String userName;
     private JPanel advancedSearchPanel;
     private SearchField searchField;
+    private int user_id;
+    private DefaultTableModel homePlaylistModel;
 
 
     // Main Constructor
@@ -91,10 +93,14 @@ public class MainScreen extends JFrame {
         // Get User Name
         connection = DatabaseManager.getConnection();
         userName = getUserName(email);
+        user_id = getUserId(email);
 
 
         // Initialize Components
         initComponents();
+
+        homePlaylistModel.setRowCount(0);
+        getPlaylists(homePlaylistModel);
     }
 
     // Initialize All Components
@@ -173,6 +179,9 @@ public class MainScreen extends JFrame {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Home");
+                homePlaylistModel.setRowCount(0);
+                getPlaylists(homePlaylistModel);
+
             }
         });
         buttonGroup.add(homeButton); 
@@ -451,20 +460,27 @@ public class MainScreen extends JFrame {
         JPanel homePanel = new JPanel();
         homePanel.setBackground(new Color(204, 204, 204)); 
 
-        DefaultTableModel newmodel = new DefaultTableModel(new Object[]{"playlist name"}, 0) {
+        homePlaylistModel = new DefaultTableModel(new Object[]{"playlist name"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-        };;
 
+        };
 
+        //#region JTable Settings
+        JTable homePlaylistTable = new JTable(homePlaylistModel);
+        homePlaylistTable.setPreferredScrollableViewportSize(new Dimension(350, 200));
+        homePlaylistTable.setFillsViewportHeight(true);
+        homePlaylistTable.getTableHeader().setReorderingAllowed(false);
 
+        TableColumnModel homeColumnModel = homePlaylistTable.getColumnModel();
+        homeColumnModel.getColumn(0).setPreferredWidth(350);
+        homeColumnModel.getColumn(0).setResizable(false);
+        
 
-
-
-
-
+        JScrollPane homeScrollPane = new JScrollPane(homePlaylistTable);
+        homeScrollPane.setPreferredSize(new Dimension(350, 200));//#endregion
 
 
         //#region Create GroupLayout for homePanel
@@ -474,20 +490,18 @@ public class MainScreen extends JFrame {
         // Horizontal group
         homeLayout.setHorizontalGroup(
             homeLayout.createSequentialGroup()
-                .addGap(100)
-                .addGap(400)
+                .addGap(600)
+                .addComponent(homeScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(50)
         );
 
         // Vertical group
         homeLayout.setVerticalGroup(
             homeLayout.createSequentialGroup()
-                .addGap(200)
+                .addGap(100)
+                .addComponent(homeScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(400)
-        );
-
-
-
-
+        );//#endregion
 
         //#endregion
         
@@ -672,7 +686,7 @@ public class MainScreen extends JFrame {
 
         //#region JTable Settings
         // Create DefaultTableModel
-        DefaultTableModel model = new DefaultTableModel(new Object[]{"Song", "Artist", "Album", "Duration"}, 0) {
+        DefaultTableModel searchModel = new DefaultTableModel(new Object[]{"Song", "Artist", "Album", "Duration"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -680,24 +694,25 @@ public class MainScreen extends JFrame {
         };;
 
         // Create JTable
-        JTable table = new JTable(model);
-        table.setPreferredScrollableViewportSize(new Dimension(800, 400));
-        table.setFillsViewportHeight(true);
+        JTable searchTable = new JTable(searchModel);
+        searchTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
+        searchTable.setFillsViewportHeight(true);
+        searchTable.getTableHeader().setReorderingAllowed(false);
 
         // Set column widths and make them non-resizable
-        TableColumnModel columnModel = table.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(250); // Song
-        columnModel.getColumn(0).setResizable(false);
-        columnModel.getColumn(1).setPreferredWidth(250); // Artist
-        columnModel.getColumn(1).setResizable(false);
-        columnModel.getColumn(2).setPreferredWidth(200); // Album
-        columnModel.getColumn(2).setResizable(false);
-        columnModel.getColumn(3).setPreferredWidth(100); // Duration
-        columnModel.getColumn(3).setResizable(false);
+        TableColumnModel searchColumnModel = searchTable.getColumnModel();
+        searchColumnModel.getColumn(0).setPreferredWidth(250); // Song
+        searchColumnModel.getColumn(0).setResizable(false);
+        searchColumnModel.getColumn(1).setPreferredWidth(250); // Artist
+        searchColumnModel.getColumn(1).setResizable(false);
+        searchColumnModel.getColumn(2).setPreferredWidth(200); // Album
+        searchColumnModel.getColumn(2).setResizable(false);
+        searchColumnModel.getColumn(3).setPreferredWidth(100); // Duration
+        searchColumnModel.getColumn(3).setResizable(false);
 
         // Create JScrollPane
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(800, 400));
+        JScrollPane searchScrollPane = new JScrollPane(searchTable);
+        searchScrollPane.setPreferredSize(new Dimension(800, 400));
         //#endregion
 
 
@@ -710,12 +725,12 @@ public class MainScreen extends JFrame {
                 // Check status of advancedSearchPanel
                 if (!advancedSearchPanel.isVisible()) {
                     // if closed, search for song or artist or album using searchField.getText() and display results in table
-                    normalSearch(model);
+                    normalSearch(searchModel);
                     return;
                 } 
 
                 searchField.getText();
-                advancedSearch(model);
+                advancedSearch(searchModel);
 
             }
         });
@@ -736,7 +751,7 @@ public class MainScreen extends JFrame {
                     .addGap(200))
                 .addGroup(searchLayout.createSequentialGroup()
                     .addGap(100)
-                    .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGap(100))
         );
 
@@ -747,7 +762,7 @@ public class MainScreen extends JFrame {
                 .addGap(10) // Adjust this value to add more space between the searchField and the advancedSearchPanel
                 .addComponent(advancedSearchPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(50)
-                .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(searchScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         );
         //#endregion
 
@@ -756,15 +771,14 @@ public class MainScreen extends JFrame {
 
         
         
-
-
-
-
-        
         // Map panel
         JPanel mapPanel = new JPanel();
         mapPanel.setBackground(new Color(204, 255, 204)); 
         
+
+
+
+
         // Compare panel
         JPanel comparePanel = new JPanel();
         comparePanel.setBackground(new Color(204, 204, 255)); 
@@ -792,7 +806,7 @@ public class MainScreen extends JFrame {
 
 
 
-    // Get user id
+    // Get user name
     public String getUserName(String email) {
         String query = "SELECT name FROM user WHERE email = ?";
         try {
@@ -808,6 +822,23 @@ public class MainScreen extends JFrame {
         return null;
     }
 
+    // get user id
+    public int getUserId(String email) {
+        String query = "SELECT user_id FROM user WHERE email = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, email);
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getInt("user_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    
 
 
 
@@ -872,14 +903,21 @@ public class MainScreen extends JFrame {
 
     public void advancedSearch(DefaultTableModel model) {
 
+        // get all fields from advanced search panel (not sure if they can be null)
+        // search in song characteristics table and get song id
+        // use the song id to get song info from song table
 
-        String sql = "SELECT * FROM song_characteristics as info, song as s WHERE info.song_id = s.song_id";
+    }
+
+    public void getPlaylists(DefaultTableModel model) {
+        String sql = "SELECT playlist_name FROM playlist WHERE user_id = ?";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+
             ResultSet rs = DatabaseManager.query(stmt);
-            model.setRowCount(0);
             while (rs.next()) {
-                model.addRow(new Object[]{rs.getString("danceability"), rs.getString("energy"), rs.getString("loudness"), rs.getString("speechiness"), rs.getString("acousticness"), rs.getString("instrumentalness"), rs.getString("liveness"), rs.getString("duration")});
+                model.addRow(new Object[]{rs.getString("playlist_name")});
             }
         } catch (SQLException e) {
             e.printStackTrace();
