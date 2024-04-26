@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.AbstractBorder;
 
@@ -48,12 +49,12 @@ public class SearchField extends JTextField {
     private boolean mouseOver = false;
     private String labelText = "Search";
     private Color lineColor = new Color(21, 170, 180);
-    private final Image eye;
-    private final Image eye_hide;
-    private boolean hide = true;
+    private final Image filter;
+    private final Image filter_checked;
+    private boolean filterMenuOpen = false;
     private boolean showAndHide;
 
-    public SearchField() {
+    public SearchField(JPanel advancedSearchMenu) {
         setOpaque(false);
         setBorder(new RoundedBorder(30));
         setSelectionColor(new Color(76, 204, 255));
@@ -75,11 +76,14 @@ public class SearchField extends JTextField {
                 if (showAndHide) {
                     int x = getWidth() - 30;
                     if (new Rectangle(x, 0, 30, 30).contains(me.getPoint())) {
-                        hide = !hide;
-                        if (hide) {
+                        filterMenuOpen = !filterMenuOpen;
+                        if (filterMenuOpen) {
                             // TODO
+                            advancedSearchMenu.setVisible(true);
+
                         } else {
                             // TODO
+                            advancedSearchMenu.setVisible(false);
                         }
                         repaint();
                     }
@@ -100,8 +104,8 @@ public class SearchField extends JTextField {
                 }
             }
         });
-        eye = new ImageIcon("src/img/filter_checked.png").getImage();
-        eye_hide = new ImageIcon("src/img/filter_unchecked.png").getImage();
+        filter_checked = new ImageIcon("src/img/filter_checked.png").getImage();
+        filter = new ImageIcon("src/img/filter_unchecked.png").getImage();
 
     }
 
@@ -128,7 +132,7 @@ public class SearchField extends JTextField {
     private void createShowHide(Graphics2D g2) {
         int x = getWidth() - 30 + 5;
         int y = (getHeight() - 20) / 2;
-        g2.drawImage(hide ? eye_hide : eye, x, y, null);
+        g2.drawImage(filterMenuOpen ? filter_checked : filter, x, y, null);
     }
 
     private void createHintText(Graphics2D g2) {
