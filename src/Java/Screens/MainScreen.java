@@ -1,10 +1,12 @@
 package Java.Screens;
 
 import Java.TextFields.SearchField;
+import javafx.scene.control.Tab;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -13,8 +15,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
@@ -39,6 +43,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
@@ -48,6 +53,10 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.ImageIcon;
 
 import Java.Database.DatabaseManager;
+import Java.Tables.PanelAction;
+import Java.Tables.TableActionCellEditor;
+import Java.Tables.TableActionCellRender;
+import Java.Tables.TableActionEvent;
 
 
 
@@ -64,13 +73,11 @@ public class MainScreen extends JFrame {
     private JSeparator seperator;
     private JButton homeButton;
     private JButton searchButton;
-    private JButton mapButton;
     private JButton compareButton;
     private JButton settingsButton;
     private JButton songStatsButton;
     private ImageIcon homeIcon;
     private ImageIcon searchIcon;
-    private ImageIcon mapIcon;
     private ImageIcon blankIcon;
     private ImageIcon settingsIcon;
     private ImageIcon songStatsIcon;
@@ -118,6 +125,7 @@ public class MainScreen extends JFrame {
     private JTable searchTable;
     private TableColumnModel searchColumnModel;
     private JScrollPane searchScrollPane;
+    private JButton logoutButton;
 
 
 
@@ -141,6 +149,50 @@ public class MainScreen extends JFrame {
 
         homePlaylistModel.setRowCount(0);
         getPlaylists(homePlaylistModel);
+
+        TableActionEvent event = new TableActionEvent() {
+            @Override
+            public void playlsitAdd(int row) {
+                String[] playlists = returnUserPlaylists();
+
+                // display an option pane with the playlists
+                if (playlists.length == 0) {
+                    JOptionPane.showMessageDialog(null, "You have no playlists to add the song to", "No Playlists", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String playlist = (String) JOptionPane.showInputDialog(null, "Select a playlist to add the song to", "Add to Playlist", JOptionPane.QUESTION_MESSAGE, null, playlists, playlists[0]);
+                if (playlist == null) {
+                    // user pressed cancel
+                    return;
+                }
+
+                // get the playlist_id
+                int playlist_id = getPlaylistId(playlist, user_id);
+                System.out.println(playlist_id);
+
+                // get the song_id
+                int song_id = getSongId((String) searchModel.getValueAt(row, 0), (String) searchModel.getValueAt(row, 1), (String) searchModel.getValueAt(row, 2));
+                System.out.println(song_id);
+
+
+                // check if the song is already in the playlist
+                if (songInPlaylist(song_id, playlist_id)) {
+                    JOptionPane.showMessageDialog(null, "The song is already in the playlist", "Song Already in Playlist", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // // add the song to the playlist
+                addSongToPlaylist(song_id, playlist_id);
+
+
+            }
+        
+        };
+
+        searchTable.getColumnModel().getColumn(4).setCellRenderer(new TableActionCellRender());
+        searchTable.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor(event));
+
     }
 
     // Initialize All Components
@@ -148,7 +200,7 @@ public class MainScreen extends JFrame {
 
         // Main Jframe settings (Window)
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setTitle("Login");
+        setTitle("SongScope");
         setResizable(false);
 
         // Main Panel (Big Panel that holds everything)
@@ -156,7 +208,7 @@ public class MainScreen extends JFrame {
         mainPanel.setBounds(0, 0, 1200, 800);
         add(mainPanel);
 
-        // Sidebar Panel (Panel on left side)
+        //#region Sidebar Panel (Panel on left side)
         sidePanel = new JPanel();
         sidePanel.setBackground(new Color(21,170,180));
         sidePanel.setPreferredSize(new Dimension(200, 800));
@@ -178,7 +230,7 @@ public class MainScreen extends JFrame {
         seperator = new JSeparator();
         seperator.setPreferredSize(new Dimension(170, 1));
 
-        // Button Group (Group of buttons that will be added to sidebar)
+        //#region Button Group (Group of buttons that will be added to sidebar)
         ButtonGroup buttonGroup = new ButtonGroup();
 
         // Home button 
@@ -216,7 +268,7 @@ public class MainScreen extends JFrame {
             }
         });
         homeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Home");
                 homePlaylistModel.setRowCount(0);
@@ -262,7 +314,7 @@ public class MainScreen extends JFrame {
             }
         });
         searchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Search");
             }
@@ -306,7 +358,7 @@ public class MainScreen extends JFrame {
             }
         });
         compareButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Compare");
             }
@@ -399,6 +451,7 @@ public class MainScreen extends JFrame {
         });
         buttonGroup.add(songStatsButton);
         sidePanel.add(songStatsButton);
+        //#endregion
 
         //#region Creates a GroupLayout for the sidePanel 
         GroupLayout sidePanelLayout = new GroupLayout(sidePanel);
@@ -441,7 +494,8 @@ public class MainScreen extends JFrame {
                 .addContainerGap())
         );
         //#endregion
-
+        
+        //#endregion
 
 
 
@@ -804,21 +858,25 @@ public class MainScreen extends JFrame {
         // Create DefaultTableModel
         // Create JTable
         searchTable = new JTable();
-        searchTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
+        searchTable.setPreferredScrollableViewportSize(new Dimension(900, 400));
         searchTable.setFillsViewportHeight(true);
         searchTable.getTableHeader().setReorderingAllowed(false);
-        searchTable.setSelectionBackground(new java.awt.Color(21, 170, 180));
+        searchTable.setSelectionBackground(new Color(21, 170, 180));
+        searchTable.setRowHeight(20);
 
 
         searchModel = new DefaultTableModel(
-            new Object[]{"Song", "Artist", "Album", "Duration"}, 0) 
+            new Object[]{"Song", "Artist", "Album", "Duration", "Add to playlist"}, 0) 
             
             
             {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
+                boolean[] canEdit = new boolean [] {
+                    false, false, false, false, true
+                };
+
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit [columnIndex];
+                }
         };;
 
         searchTable.setModel(searchModel);
@@ -826,18 +884,18 @@ public class MainScreen extends JFrame {
         
         // Set column widths and make them non-resizable
         searchColumnModel = searchTable.getColumnModel();
-        searchColumnModel.getColumn(0).setPreferredWidth(250); // Song
+        searchColumnModel.getColumn(0).setPreferredWidth(225); // Song
         searchColumnModel.getColumn(0).setResizable(false);
-        searchColumnModel.getColumn(1).setPreferredWidth(250); // Artist
+        searchColumnModel.getColumn(1).setPreferredWidth(225); // Artist
         searchColumnModel.getColumn(1).setResizable(false);
         searchColumnModel.getColumn(2).setPreferredWidth(200); // Album
         searchColumnModel.getColumn(2).setResizable(false);
-        searchColumnModel.getColumn(3).setPreferredWidth(100); // Duration
+        searchColumnModel.getColumn(3).setPreferredWidth(50); // Duration
         searchColumnModel.getColumn(3).setResizable(false);
 
         // Create JScrollPane
         searchScrollPane = new JScrollPane(searchTable);
-        searchScrollPane.setPreferredSize(new Dimension(800, 400));
+        searchScrollPane.setPreferredSize(new Dimension(900, 400));
         //#endregion
 
         //#region Search Field 
@@ -872,9 +930,9 @@ public class MainScreen extends JFrame {
                     .addComponent(advancedSearchPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGap(200))
                 .addGroup(searchLayout.createSequentialGroup()
-                    .addGap(100)
+                    .addGap(50)
                     .addComponent(searchScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(100))
+                    .addGap(50))
         );
 
         searchLayout.setVerticalGroup(
@@ -890,18 +948,56 @@ public class MainScreen extends JFrame {
 
         //#endregion
 
-
-        // Compare panel
+        //#region Compare panel
         JPanel comparePanel = new JPanel();
         comparePanel.setBackground(new Color(204, 204, 255)); 
+        //#endregion
         
-        // Song Stats panel
+        //#region Song Stats panel
         JPanel songStatsPanel = new JPanel();
         songStatsPanel.setBackground(new Color(255, 255, 204)); 
-        
-        // Settings panel
+        //#endregion
+
+        //#region Settings panel
         JPanel settingsPanel = new JPanel();
         settingsPanel.setBackground(new Color(204, 255, 255));
+
+        // Logout Button
+        logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(21, 170, 180));
+        logoutButton.setForeground(new Color(255,255,255));
+        logoutButton.setFont(new Font("Helvetica Neue", 0, 18));
+        logoutButton.setFocusPainted(false);
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                LoginScreen loginScreen = new LoginScreen();
+                loginScreen.setVisible(true);
+                loginScreen.setLocationRelativeTo(null);
+                dispose();
+            }
+        });
+
+        // Create GroupLayout for settingsPanel
+        GroupLayout settingsLayout = new GroupLayout(settingsPanel);
+        settingsPanel.setLayout(settingsLayout);
+
+        // Horizontal group
+        settingsLayout.setHorizontalGroup(
+            settingsLayout.createSequentialGroup()
+                .addGap(450)
+                .addComponent(logoutButton, 100,100,100)
+                .addGap(450)
+        );
+
+        // Vertical group
+        settingsLayout.setVerticalGroup(
+            settingsLayout.createSequentialGroup()
+                .addGap(400)
+                .addComponent(logoutButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(400)
+        );
+        //#endregion
+
 
         // Add each JPanel to the mainScreenPanel
         mainScreenPanel.add(homePanel, "Home");
@@ -948,7 +1044,6 @@ public class MainScreen extends JFrame {
         }
         return -1;
     }
-
 
     public class RoundedBorder extends AbstractBorder {
         private int radius;
@@ -1106,6 +1201,94 @@ public class MainScreen extends JFrame {
             while (rs.next()) {
                 model.addRow(new Object[]{rs.getString("playlist_name")});
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] returnUserPlaylists() {
+        String sql = "SELECT playlist_name FROM playlist WHERE user_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            ArrayList<String> playlists = new ArrayList<>();
+            while (rs.next()) {
+                playlists.add(rs.getString("playlist_name"));
+            }
+            return playlists.toArray(new String[playlists.size()]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public int getPlaylistId(String playlistName, int user_id) {
+        String sql = "SELECT playlist_id FROM playlist WHERE user_id = ? AND playlist_name = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+            stmt.setString(2, playlistName);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getInt("playlist_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    
+    }
+
+    public int getSongId(String songName, String artistName, String albumName) {
+        String sql = "SELECT song_id " +
+                     "FROM song as s " +
+                     "JOIN album as a ON s.album_id = a.album_id " +
+                     "WHERE s.song_name = ? AND s.song_artist = ? AND a.album_name = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, songName);
+            stmt.setString(2, artistName);
+            stmt.setString(3, albumName);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getInt("song_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean songInPlaylist(int song_id, int playlist_id) {
+        String sql = "SELECT * FROM playlist_has_song WHERE song_id = ? AND playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
+            stmt.setInt(2, playlist_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void addSongToPlaylist(int song_id, int playlist_id) {
+        String sql = "INSERT INTO playlist_has_song (song_id, playlist_id) VALUES (?, ?)";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
+            stmt.setInt(2, playlist_id);
+
+            DatabaseManager.update(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
         }
