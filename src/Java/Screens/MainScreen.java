@@ -1,10 +1,12 @@
 package Java.Screens;
 
 import Java.TextFields.SearchField;
+import javafx.scene.control.Tab;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -12,8 +14,11 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.LayoutStyle;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
@@ -38,6 +43,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
@@ -47,6 +53,10 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.ImageIcon;
 
 import Java.Database.DatabaseManager;
+import Java.Tables.PanelAction;
+import Java.Tables.TableActionCellEditor;
+import Java.Tables.TableActionCellRender;
+import Java.Tables.TableActionEvent;
 
 
 
@@ -63,13 +73,11 @@ public class MainScreen extends JFrame {
     private JSeparator seperator;
     private JButton homeButton;
     private JButton searchButton;
-    private JButton mapButton;
     private JButton compareButton;
     private JButton settingsButton;
     private JButton songStatsButton;
     private ImageIcon homeIcon;
     private ImageIcon searchIcon;
-    private ImageIcon mapIcon;
     private ImageIcon blankIcon;
     private ImageIcon settingsIcon;
     private ImageIcon songStatsIcon;
@@ -79,6 +87,46 @@ public class MainScreen extends JFrame {
     private SearchField searchField;
     private int user_id;
     private DefaultTableModel homePlaylistModel;
+    private JTextField artistName;
+    private JTextField songName;
+    private JTextField albumName;
+    private JTextField danceabilityMin;
+    private JTextField danceabilityMax;
+    private JTextField energyMin;
+    private JTextField energyMax;
+    private JTextField loudnessMin;
+    private JTextField loudnessMax;
+    private JTextField speechinessMin;
+    private JTextField speechinessMax;
+    private JTextField acousticnessMin;
+    private JTextField acousticnessMax;
+    private JTextField instrumentalnessMin;
+    private JTextField instrumentalnessMax;
+    private JTextField livenessMin;
+    private JTextField livenessMax;
+    private JTextField durationMin;
+    private JTextField durationMax;
+    private JTextField popularityMin;
+    private JTextField popularityMax;
+    private DefaultTableModel searchModel;
+    private JLabel artistNameField;
+    private JLabel songNameField;
+    private JLabel albumNameField;
+    private JLabel danceabilityField;
+    private JLabel energyField;
+    private JLabel loudnessField;
+    private JLabel speechinessField;
+    private JLabel acousticnessField;
+    private JLabel instrumentalnessField;
+    private JLabel livenessField;
+    private JLabel durationField;
+    private JLabel popularityField;
+    private JPanel searchPanel;
+    private JTable searchTable;
+    private TableColumnModel searchColumnModel;
+    private JScrollPane searchScrollPane;
+    private JButton logoutButton;
+
 
 
     // Main Constructor
@@ -101,6 +149,50 @@ public class MainScreen extends JFrame {
 
         homePlaylistModel.setRowCount(0);
         getPlaylists(homePlaylistModel);
+
+        TableActionEvent event = new TableActionEvent() {
+            @Override
+            public void playlsitAdd(int row) {
+                String[] playlists = returnUserPlaylists();
+
+                // display an option pane with the playlists
+                if (playlists.length == 0) {
+                    JOptionPane.showMessageDialog(null, "You have no playlists to add the song to", "No Playlists", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                String playlist = (String) JOptionPane.showInputDialog(null, "Select a playlist to add the song to", "Add to Playlist", JOptionPane.QUESTION_MESSAGE, null, playlists, playlists[0]);
+                if (playlist == null) {
+                    // user pressed cancel
+                    return;
+                }
+
+                // get the playlist_id
+                int playlist_id = getPlaylistId(playlist, user_id);
+                System.out.println(playlist_id);
+
+                // get the song_id
+                int song_id = getSongId((String) searchModel.getValueAt(row, 0), (String) searchModel.getValueAt(row, 1), (String) searchModel.getValueAt(row, 2));
+                System.out.println(song_id);
+
+
+                // check if the song is already in the playlist
+                if (songInPlaylist(song_id, playlist_id)) {
+                    JOptionPane.showMessageDialog(null, "The song is already in the playlist", "Song Already in Playlist", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // // add the song to the playlist
+                addSongToPlaylist(song_id, playlist_id);
+
+
+            }
+        
+        };
+
+        searchTable.getColumnModel().getColumn(4).setCellRenderer(new TableActionCellRender());
+        searchTable.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor(event));
+
     }
 
     // Initialize All Components
@@ -108,7 +200,7 @@ public class MainScreen extends JFrame {
 
         // Main Jframe settings (Window)
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setTitle("Login");
+        setTitle("SongScope");
         setResizable(false);
 
         // Main Panel (Big Panel that holds everything)
@@ -116,7 +208,7 @@ public class MainScreen extends JFrame {
         mainPanel.setBounds(0, 0, 1200, 800);
         add(mainPanel);
 
-        // Sidebar Panel (Panel on left side)
+        //#region Sidebar Panel (Panel on left side)
         sidePanel = new JPanel();
         sidePanel.setBackground(new Color(21,170,180));
         sidePanel.setPreferredSize(new Dimension(200, 800));
@@ -138,7 +230,7 @@ public class MainScreen extends JFrame {
         seperator = new JSeparator();
         seperator.setPreferredSize(new Dimension(170, 1));
 
-        // Button Group (Group of buttons that will be added to sidebar)
+        //#region Button Group (Group of buttons that will be added to sidebar)
         ButtonGroup buttonGroup = new ButtonGroup();
 
         // Home button 
@@ -176,7 +268,7 @@ public class MainScreen extends JFrame {
             }
         });
         homeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Home");
                 homePlaylistModel.setRowCount(0);
@@ -222,7 +314,7 @@ public class MainScreen extends JFrame {
             }
         });
         searchButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Search");
             }
@@ -230,48 +322,6 @@ public class MainScreen extends JFrame {
         buttonGroup.add(searchButton); 
         sidePanel.add(searchButton);
         
-        // Map Button
-        mapButton = new JButton("Map");
-        mapIcon = new ImageIcon("src/img/globe.png");
-        mapButton.setIcon(mapIcon);
-        mapButton.setIconTextGap(20);
-        mapButton.setHorizontalAlignment(JButton.LEFT);
-        mapButton.setBackground(new Color(21, 170, 180));
-        mapButton.setForeground(new Color(255,255,255));
-        mapButton.setFont(new Font("Helvetica Neue", 0, 18));
-        mapButton.setBorder(BorderFactory.createEmptyBorder(0,20,0,0));
-        mapButton.setFocusPainted(false);
-        mapButton.setModel(new JToggleButton.ToggleButtonModel()); 
-        mapButton.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent evt) {
-                if (!mapButton.isSelected()) {
-                    mapButton.setBackground(new Color(10,114,121)); 
-                }
-            }
-        
-            public void mouseExited(MouseEvent evt) {
-                if (!mapButton.isSelected()) {
-                    mapButton.setBackground(new Color(21, 170, 180)); 
-                }
-            }
-        });
-        mapButton.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent evt) {
-                if (evt.getStateChange() == ItemEvent.SELECTED) {
-                    mapButton.setBackground(new Color(10,114,121)); 
-                } else {
-                    mapButton.setBackground(new Color(21, 170, 180)); 
-                }
-            }
-        });
-        mapButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
-                cardLayout.show(mainScreenPanel, "Map");
-            }
-        });
-        buttonGroup.add(mapButton); 
-        sidePanel.add(mapButton);
 
         // Compare Button
         compareButton = new JButton("Compare");
@@ -308,7 +358,7 @@ public class MainScreen extends JFrame {
             }
         });
         compareButton.addActionListener(new ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Compare");
             }
@@ -401,6 +451,7 @@ public class MainScreen extends JFrame {
         });
         buttonGroup.add(songStatsButton);
         sidePanel.add(songStatsButton);
+        //#endregion
 
         //#region Creates a GroupLayout for the sidePanel 
         GroupLayout sidePanelLayout = new GroupLayout(sidePanel);
@@ -418,7 +469,6 @@ public class MainScreen extends JFrame {
                 .addContainerGap(15, Short.MAX_VALUE))
             .addComponent(homeButton, 200,200,200)
             .addComponent(searchButton, 200,200,200)
-            .addComponent(mapButton, 200,200,200)
             .addComponent(compareButton, 200,200,200)
             .addComponent(settingsButton, 200,200,200)
             .addComponent(songStatsButton, 200,200,200)
@@ -426,26 +476,26 @@ public class MainScreen extends JFrame {
 
         // Sets vertical Grouping for sidePanel
         sidePanelLayout.setVerticalGroup(
-            sidePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            sidePanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(sidePanelLayout.createSequentialGroup()
                 .addGap(25)
-                .addComponent(welcomeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(welcomeLabel, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nameLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(seperator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(100)
-                .addComponent(homeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(searchButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(mapButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(compareButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addComponent(songStatsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(330)
-                .addComponent(settingsButton, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(seperator, GroupLayout.PREFERRED_SIZE, 10, GroupLayout.PREFERRED_SIZE)
+                .addGap(50)
+                .addComponent(homeButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                .addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                .addComponent(compareButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                .addComponent(songStatsButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                .addGap(400)
+                .addComponent(settingsButton, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         //#endregion
-
+        
+        //#endregion
 
 
 
@@ -506,7 +556,7 @@ public class MainScreen extends JFrame {
         //#endregion
         
         //#region Search panel
-        JPanel searchPanel = new JPanel();
+        searchPanel = new JPanel();
         searchPanel.setBackground(new Color(255, 204, 204));
 
 
@@ -519,74 +569,166 @@ public class MainScreen extends JFrame {
         advancedSearchPanel.setVisible(false);
 
         // artist name
-        JLabel artistNameField = new JLabel("Artist Name");
-        JTextField artistName = new JTextField();
-
+        artistNameField = new JLabel("Artist Name");
+        artistName = new JTextField();
+        artistName.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // song name
-        JLabel songNameField = new JLabel("Song Name");
-        JTextField songName = new JTextField();
-
+        songNameField = new JLabel("Song Name");
+        songName = new JTextField();
+        songName.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // album name
-        JLabel albumNameField = new JLabel("Album Name");
-        JTextField albumName = new JTextField();
-
+        albumNameField = new JLabel("Album Name");
+        albumName = new JTextField();
+        albumName.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // danceability
-        JLabel danceabilityField = new JLabel("Danceability (0...1)");
-        JTextField danceabilityMin = new JTextField();
-        JTextField danceabilityMax = new JTextField();
-
-
+        danceabilityField = new JLabel("Danceability (0...1)");
+        danceabilityMin = new JTextField();
+        danceabilityMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        danceabilityMax = new JTextField();
+        danceabilityMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // energy
-        JLabel energyField = new JLabel("Energy (0...1)");
-        JTextField energyMin = new JTextField();
-        JTextField energyMax = new JTextField();
-
-
+        energyField = new JLabel("Energy (0...1)");
+        energyMin = new JTextField();
+        energyMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        energyMax = new JTextField();
+        energyMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        
         // loudness
-        JLabel loudnessField = new JLabel("Loudness (-20...0)");
-        JTextField loudnessMin = new JTextField();
-        JTextField loudnessMax = new JTextField();
-
+        loudnessField = new JLabel("Loudness (-20...0)");
+        loudnessMin = new JTextField();
+        loudnessMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        loudnessMax = new JTextField();
+        loudnessMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // speechiness
-        JLabel speechinessField = new JLabel("Speechiness (0...1)");
-        JTextField speechinessMin = new JTextField();
-        JTextField speechinessMax = new JTextField();
-
+        speechinessField = new JLabel("Speechiness (0...1)");
+        speechinessMin = new JTextField();
+        speechinessMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        speechinessMax = new JTextField();
+        speechinessMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // acousticness
-        JLabel acousticnessField = new JLabel("Acousticness (0...1)");
-        JTextField acousticnessMin = new JTextField();
-        JTextField acousticnessMax = new JTextField();
-
+        acousticnessField = new JLabel("Acousticness (0...1)");
+        acousticnessMin = new JTextField();
+        acousticnessMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        acousticnessMax = new JTextField();
+        acousticnessMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // instrumentalness
-        JLabel instrumentalnessField = new JLabel("Instrumentalness (0...1)");
-        JTextField instrumentalnessMin = new JTextField();
-        JTextField instrumentalnessMax = new JTextField();
-
+        instrumentalnessField = new JLabel("Instrumentalness (0...1)");
+        instrumentalnessMin = new JTextField();
+        instrumentalnessMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        instrumentalnessMax = new JTextField();
+        instrumentalnessMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // liveness
-        JLabel livenessField = new JLabel("Liveness (0...1)");
-        JTextField livenessMin = new JTextField();
-        JTextField livenessMax = new JTextField();
-
+        livenessField = new JLabel("Liveness (0...1)");
+        livenessMin = new JTextField();
+        livenessMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        livenessMax = new JTextField();
+        livenessMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // duration
-        JLabel durationField = new JLabel("Duration (ms)");
-        JTextField durationMin = new JTextField();
-        JTextField durationMax = new JTextField();
-
+        durationField = new JLabel("Duration (seconds)");
+        durationMin = new JTextField();
+        durationMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        durationMax = new JTextField();
+        durationMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
 
         // popularity
-        JLabel popularityField = new JLabel("Popularity (0...100)");
-        JTextField popularityMin = new JTextField();
-        JTextField popularityMax = new JTextField();
-        //#endregion
+        popularityField = new JLabel("Popularity (0...100)");
+        popularityMin = new JTextField();
+        popularityMin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });
+        popularityMax = new JTextField();
+        popularityMax.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                advancedSearch(searchModel);
+            }
+        });//#endregion
 
         //#region Create GroupLayout for advancedSearchPanel
         GroupLayout advancedSearchLayout = new GroupLayout(advancedSearchPanel);
@@ -595,89 +737,117 @@ public class MainScreen extends JFrame {
         // Horizontal group
         advancedSearchLayout.setHorizontalGroup(
             advancedSearchLayout.createSequentialGroup()
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(artistNameField)
                     .addComponent(songNameField)
                     .addComponent(albumNameField)
                     .addComponent(danceabilityField)
                     .addComponent(energyField)
-                    .addComponent(loudnessField)
-                    .addComponent(speechinessField)
-                    .addComponent(acousticnessField)
-                    .addComponent(instrumentalnessField)
-                    .addComponent(livenessField)
-                    .addComponent(durationField)
-                    .addComponent(popularityField))
+                    .addComponent(loudnessField))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(artistName)
-                    .addComponent(songName)
-                    .addComponent(albumName)
-                    .addComponent(danceabilityMin)
-                    .addComponent(energyMin)
-                    .addComponent(loudnessMin)
-                    .addComponent(speechinessMin)
-                    .addComponent(acousticnessMin)
-                    .addComponent(instrumentalnessMin)
-                    .addComponent(livenessMin)
-                    .addComponent(durationMin)
-                    .addComponent(popularityMin))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(artistName, 150, 150, 150))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(songName, 150, 150, 150))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(albumName, 150, 150, 150))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(danceabilityMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(danceabilityMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(energyMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(energyMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(loudnessMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(loudnessMax, 50, 50, 50))
+                )
+                .addGap(30)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(danceabilityMax)
-                    .addComponent(energyMax)
-                    .addComponent(loudnessMax)
-                    .addComponent(speechinessMax)
-                    .addComponent(acousticnessMax)
-                    .addComponent(instrumentalnessMax)
-                    .addComponent(livenessMax)
-                    .addComponent(durationMax)
-                    .addComponent(popularityMax))
+                .addComponent(speechinessField)
+                .addComponent(acousticnessField)
+                .addComponent(instrumentalnessField)
+                .addComponent(livenessField)
+                .addComponent(durationField)
+                .addComponent(popularityField))
+                .addGap(10)
+                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(speechinessMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(speechinessMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(acousticnessMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(acousticnessMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(instrumentalnessMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(instrumentalnessMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(livenessMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(livenessMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(durationMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(durationMax, 50, 50, 50))
+                    .addGroup(advancedSearchLayout.createSequentialGroup()
+                        .addComponent(popularityMin, 50, 50, 50)
+                        .addGap(10)
+                        .addComponent(popularityMax, 50, 50, 50))
+                )
         );
+        
 
         // Vertical group
         advancedSearchLayout.setVerticalGroup(
             advancedSearchLayout.createSequentialGroup()
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(artistNameField)
-                    .addComponent(artistName))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(songNameField)
-                    .addComponent(songName))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(albumNameField)
-                    .addComponent(albumName))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(danceabilityField)
-                    .addComponent(danceabilityMin)
-                    .addComponent(danceabilityMax))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(energyField)
-                    .addComponent(energyMin)
-                    .addComponent(energyMax))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(loudnessField)
-                    .addComponent(loudnessMin)
-                    .addComponent(loudnessMax))
-                .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(artistName)
                     .addComponent(speechinessField)
                     .addComponent(speechinessMin)
                     .addComponent(speechinessMax))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(songNameField)
+                    .addComponent(songName)
                     .addComponent(acousticnessField)
                     .addComponent(acousticnessMin)
                     .addComponent(acousticnessMax))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(albumNameField)
+                    .addComponent(albumName)
                     .addComponent(instrumentalnessField)
                     .addComponent(instrumentalnessMin)
                     .addComponent(instrumentalnessMax))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(danceabilityField)
+                    .addComponent(danceabilityMin)
+                    .addComponent(danceabilityMax)
                     .addComponent(livenessField)
                     .addComponent(livenessMin)
                     .addComponent(livenessMax))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(energyField)
+                    .addComponent(energyMin)
+                    .addComponent(energyMax)
                     .addComponent(durationField)
                     .addComponent(durationMin)
                     .addComponent(durationMax))
+                .addGap(10)
                 .addGroup(advancedSearchLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(loudnessField)
+                    .addComponent(loudnessMin)
+                    .addComponent(loudnessMax)
                     .addComponent(popularityField)
                     .addComponent(popularityMin)
                     .addComponent(popularityMax))
@@ -686,37 +856,49 @@ public class MainScreen extends JFrame {
 
         //#region JTable Settings
         // Create DefaultTableModel
-        DefaultTableModel searchModel = new DefaultTableModel(new Object[]{"Song", "Artist", "Album", "Duration"}, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };;
-
         // Create JTable
-        JTable searchTable = new JTable(searchModel);
-        searchTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
+        searchTable = new JTable();
+        searchTable.setPreferredScrollableViewportSize(new Dimension(900, 400));
         searchTable.setFillsViewportHeight(true);
         searchTable.getTableHeader().setReorderingAllowed(false);
+        searchTable.setSelectionBackground(new Color(21, 170, 180));
+        searchTable.setRowHeight(20);
 
+
+        searchModel = new DefaultTableModel(
+            new Object[]{"Song", "Artist", "Album", "Duration", "Add to playlist"}, 0) 
+            
+            
+            {
+                boolean[] canEdit = new boolean [] {
+                    false, false, false, false, true
+                };
+
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit [columnIndex];
+                }
+        };;
+
+        searchTable.setModel(searchModel);
+
+        
         // Set column widths and make them non-resizable
-        TableColumnModel searchColumnModel = searchTable.getColumnModel();
-        searchColumnModel.getColumn(0).setPreferredWidth(250); // Song
+        searchColumnModel = searchTable.getColumnModel();
+        searchColumnModel.getColumn(0).setPreferredWidth(225); // Song
         searchColumnModel.getColumn(0).setResizable(false);
-        searchColumnModel.getColumn(1).setPreferredWidth(250); // Artist
+        searchColumnModel.getColumn(1).setPreferredWidth(225); // Artist
         searchColumnModel.getColumn(1).setResizable(false);
         searchColumnModel.getColumn(2).setPreferredWidth(200); // Album
         searchColumnModel.getColumn(2).setResizable(false);
-        searchColumnModel.getColumn(3).setPreferredWidth(100); // Duration
+        searchColumnModel.getColumn(3).setPreferredWidth(50); // Duration
         searchColumnModel.getColumn(3).setResizable(false);
 
         // Create JScrollPane
-        JScrollPane searchScrollPane = new JScrollPane(searchTable);
-        searchScrollPane.setPreferredSize(new Dimension(800, 400));
+        searchScrollPane = new JScrollPane(searchTable);
+        searchScrollPane.setPreferredSize(new Dimension(900, 400));
         //#endregion
 
-
-        // Search Field 
+        //#region Search Field 
         searchField = new SearchField(advancedSearchPanel);
         searchField.setPreferredSize(new Dimension(600, 30));
         searchField.setShowAndHide(true);
@@ -728,12 +910,10 @@ public class MainScreen extends JFrame {
                     normalSearch(searchModel);
                     return;
                 } 
-
-                searchField.getText();
                 advancedSearch(searchModel);
 
             }
-        });
+        }); //#endregion
 
         //#region Create GroupLayout for searchPanel
         GroupLayout searchLayout = new GroupLayout(searchPanel); 
@@ -750,16 +930,16 @@ public class MainScreen extends JFrame {
                     .addComponent(advancedSearchPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addGap(200))
                 .addGroup(searchLayout.createSequentialGroup()
-                    .addGap(100)
+                    .addGap(50)
                     .addComponent(searchScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(100))
+                    .addGap(50))
         );
 
         searchLayout.setVerticalGroup(
             searchLayout.createSequentialGroup()
                 .addGap(50)
                 .addComponent(searchField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addGap(10) // Adjust this value to add more space between the searchField and the advancedSearchPanel
+                .addGap(10) 
                 .addComponent(advancedSearchPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(50)
                 .addComponent(searchScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -768,33 +948,60 @@ public class MainScreen extends JFrame {
 
         //#endregion
 
-
-        
-        
-        // Map panel
-        JPanel mapPanel = new JPanel();
-        mapPanel.setBackground(new Color(204, 255, 204)); 
-        
-
-
-
-
-        // Compare panel
+        //#region Compare panel
         JPanel comparePanel = new JPanel();
         comparePanel.setBackground(new Color(204, 204, 255)); 
+        //#endregion
         
-        // Song Stats panel
+        //#region Song Stats panel
         JPanel songStatsPanel = new JPanel();
         songStatsPanel.setBackground(new Color(255, 255, 204)); 
-        
-        // Settings panel
+        //#endregion
+
+        //#region Settings panel
         JPanel settingsPanel = new JPanel();
         settingsPanel.setBackground(new Color(204, 255, 255));
+
+        // Logout Button
+        logoutButton = new JButton("Logout");
+        logoutButton.setBackground(new Color(21, 170, 180));
+        logoutButton.setForeground(new Color(255,255,255));
+        logoutButton.setFont(new Font("Helvetica Neue", 0, 18));
+        logoutButton.setFocusPainted(false);
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                LoginScreen loginScreen = new LoginScreen();
+                loginScreen.setVisible(true);
+                loginScreen.setLocationRelativeTo(null);
+                dispose();
+            }
+        });
+
+        // Create GroupLayout for settingsPanel
+        GroupLayout settingsLayout = new GroupLayout(settingsPanel);
+        settingsPanel.setLayout(settingsLayout);
+
+        // Horizontal group
+        settingsLayout.setHorizontalGroup(
+            settingsLayout.createSequentialGroup()
+                .addGap(450)
+                .addComponent(logoutButton, 100,100,100)
+                .addGap(450)
+        );
+
+        // Vertical group
+        settingsLayout.setVerticalGroup(
+            settingsLayout.createSequentialGroup()
+                .addGap(400)
+                .addComponent(logoutButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(400)
+        );
+        //#endregion
+
 
         // Add each JPanel to the mainScreenPanel
         mainScreenPanel.add(homePanel, "Home");
         mainScreenPanel.add(searchPanel, "Search");
-        mainScreenPanel.add(mapPanel, "Map");
         mainScreenPanel.add(comparePanel, "Compare");
         mainScreenPanel.add(songStatsPanel, "Song Stats");
         mainScreenPanel.add(settingsPanel, "Settings");
@@ -837,12 +1044,6 @@ public class MainScreen extends JFrame {
         }
         return -1;
     }
-
-    
-
-
-
-
 
     public class RoundedBorder extends AbstractBorder {
         private int radius;
@@ -906,6 +1107,87 @@ public class MainScreen extends JFrame {
         // get all fields from advanced search panel (not sure if they can be null)
         // search in song characteristics table and get song id
         // use the song id to get song info from song table
+        String artist = artistName.getText().isEmpty() ? "" : artistName.getText();
+        String song = songName.getText().isEmpty() ? "" : songName.getText();
+        String album = albumName.getText().isEmpty() ? "" : albumName.getText();
+        double danceabilityLow = danceabilityMin.getText().isEmpty() ? 0.0 : Double.parseDouble(danceabilityMin.getText());
+        double danceabilityHigh = danceabilityMax.getText().isEmpty() ? 1.0 : Double.parseDouble(danceabilityMax.getText());
+        double energyLow = energyMin.getText().isEmpty() ? 0.0 : Double.parseDouble(energyMin.getText());
+        double energyHigh = energyMax.getText().isEmpty() ? 1.0 : Double.parseDouble(energyMax.getText());
+        double loudnessLow = loudnessMin.getText().isEmpty() ? -20.0 : Double.parseDouble(loudnessMin.getText());
+        double loudnessHigh = loudnessMax.getText().isEmpty() ? 0.0 : Double.parseDouble(loudnessMax.getText());
+        double speechinessLow = speechinessMin.getText().isEmpty() ? 0.0 : Double.parseDouble(speechinessMin.getText());
+        double speechinessHigh = speechinessMax.getText().isEmpty() ? 1.0 : Double.parseDouble(speechinessMax.getText());
+        double acousticnessLow = acousticnessMin.getText().isEmpty() ? 0.0 : Double.parseDouble(acousticnessMin.getText());
+        double acousticnessHigh = acousticnessMax.getText().isEmpty() ? 1.0 : Double.parseDouble(acousticnessMax.getText());
+        double instrumentalnessLow = instrumentalnessMin.getText().isEmpty() ? 0.0 : Double.parseDouble(instrumentalnessMin.getText());
+        double instrumentalnessHigh = instrumentalnessMax.getText().isEmpty() ? 1.0 : Double.parseDouble(instrumentalnessMax.getText());
+        double livenessLow = livenessMin.getText().isEmpty() ? 0.0 : Double.parseDouble(livenessMin.getText());
+        double livenessHigh = livenessMax.getText().isEmpty() ? 1.0 : Double.parseDouble(livenessMax.getText());
+        int durationLow = durationMin.getText().isEmpty() ? 0 : Integer.parseInt(durationMin.getText());
+        durationLow *= 1000;
+        int durationHigh = durationMax.getText().isEmpty() ? 10000 : Integer.parseInt(durationMax.getText());
+        durationHigh *= 1000;
+        int popularityLow = popularityMin.getText().isEmpty() ? 0 : Integer.parseInt(popularityMin.getText());
+        int popularityHigh = popularityMax.getText().isEmpty() ? 100 : Integer.parseInt(popularityMax.getText());
+
+        try {
+            String sql = "SELECT s.song_name, s.song_artist, s.duration, a.album_name "
+                        + "FROM song as s "
+                        + "JOIN album as a ON s.album_id = a.album_id "
+                        + "JOIN song_characteristics as sc ON s.song_id = sc.song_id "
+                        + "JOIN song_popularity as sp ON s.song_id = sp.song_id "
+                        + "WHERE s.song_artist LIKE ? AND s.song_name LIKE ? AND a.album_name LIKE ? "
+                        + "AND sc.danceability BETWEEN ? AND ? "
+                        + "AND sc.energy BETWEEN ? AND ? "
+                        + "AND sc.loudness BETWEEN ? AND ? "
+                        + "AND sc.speechiness BETWEEN ? AND ? "
+                        + "AND sc.acousticness BETWEEN ? AND ? "
+                        + "AND sc.instrumentalness BETWEEN ? AND ? "
+                        + "AND sc.liveness BETWEEN ? AND ? "
+                        + "AND s.duration BETWEEN ? AND ? "
+                        + "AND sp.popularity BETWEEN ? AND ?";                                                
+                                    
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, "%" + artist + "%");
+            stmt.setString(2, "%" + song + "%");
+            stmt.setString(3, "%" + album + "%");
+            stmt.setDouble(4, danceabilityLow);
+            stmt.setDouble(5, danceabilityHigh);
+            stmt.setDouble(6, energyLow);
+            stmt.setDouble(7, energyHigh);
+            stmt.setDouble(8, loudnessLow);
+            stmt.setDouble(9, loudnessHigh);
+            stmt.setDouble(10, speechinessLow);
+            stmt.setDouble(11, speechinessHigh);
+            stmt.setDouble(12, acousticnessLow);
+            stmt.setDouble(13, acousticnessHigh);
+            stmt.setDouble(14, instrumentalnessLow);
+            stmt.setDouble(15, instrumentalnessHigh);
+            stmt.setDouble(16, livenessLow);
+            stmt.setDouble(17, livenessHigh);
+            stmt.setInt(18, durationLow);
+            stmt.setInt(19, durationHigh);
+            stmt.setInt(20, popularityLow);
+            stmt.setInt(21, popularityHigh);
+            ResultSet rs = DatabaseManager.query(stmt);
+
+            model.setRowCount(0);
+            while (rs.next()) {
+                long durationMs = rs.getLong("duration");
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) % 60;
+                String durationStr = String.format("%02d:%02d", minutes, seconds);
+
+                model.addRow(new Object[]{rs.getString("song_name"), rs.getString("song_artist"), rs.getString("album_name"), durationStr});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
+
 
     }
 
@@ -919,6 +1201,94 @@ public class MainScreen extends JFrame {
             while (rs.next()) {
                 model.addRow(new Object[]{rs.getString("playlist_name")});
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String[] returnUserPlaylists() {
+        String sql = "SELECT playlist_name FROM playlist WHERE user_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            ArrayList<String> playlists = new ArrayList<>();
+            while (rs.next()) {
+                playlists.add(rs.getString("playlist_name"));
+            }
+            return playlists.toArray(new String[playlists.size()]);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public int getPlaylistId(String playlistName, int user_id) {
+        String sql = "SELECT playlist_id FROM playlist WHERE user_id = ? AND playlist_name = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+            stmt.setString(2, playlistName);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getInt("playlist_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    
+    }
+
+    public int getSongId(String songName, String artistName, String albumName) {
+        String sql = "SELECT song_id " +
+                     "FROM song as s " +
+                     "JOIN album as a ON s.album_id = a.album_id " +
+                     "WHERE s.song_name = ? AND s.song_artist = ? AND a.album_name = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setString(1, songName);
+            stmt.setString(2, artistName);
+            stmt.setString(3, albumName);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getInt("song_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public boolean songInPlaylist(int song_id, int playlist_id) {
+        String sql = "SELECT * FROM playlist_has_song WHERE song_id = ? AND playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
+            stmt.setInt(2, playlist_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void addSongToPlaylist(int song_id, int playlist_id) {
+        String sql = "INSERT INTO playlist_has_song (song_id, playlist_id) VALUES (?, ?)";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
+            stmt.setInt(2, playlist_id);
+
+            DatabaseManager.update(stmt);
         } catch (SQLException e) {
             e.printStackTrace();
         }
