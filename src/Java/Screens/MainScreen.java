@@ -1,24 +1,22 @@
 package Java.Screens;
 
 import Java.TextFields.SearchField;
-import javafx.scene.control.Tab;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
-import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.border.AbstractBorder;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.JButton;
@@ -44,19 +42,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.ImageIcon;
 
 import Java.Database.DatabaseManager;
-import Java.Tables.PanelAction;
 import Java.Tables.TableActionCellEditor;
 import Java.Tables.TableActionCellRender;
 import Java.Tables.TableActionEvent;
+
+import Java.Charts.PopularityChart;
+import Java.Charts.RankingsChart;
 
 
 
@@ -126,6 +126,25 @@ public class MainScreen extends JFrame {
     private TableColumnModel searchColumnModel;
     private JScrollPane searchScrollPane;
     private JButton logoutButton;
+    private DefaultTableModel statsPlayListModel;
+    private JTable statsPlaylistTable;
+    private TableColumnModel statsPlaylistColumnModel;
+    private JScrollPane statsPlaylistScrollPane;
+    private DefaultTableModel statsSongModel;
+    private JTable statsSongTable;
+    private TableColumnModel statsSongColumnModel;
+    private JScrollPane statsSongScrollPane;
+    private JTable homePlaylistTable;
+    private TableColumnModel homeColumnModel;
+    private JScrollPane homeScrollPane;
+    private JTable statsFullTable;
+    private TableColumnModel statsFullColumnModel;
+    private JScrollPane statsFullScrollPane;
+    private DefaultTableModel statsFullModel;
+    private PopularityChart popularityChart;
+    private RankingsChart rankingsChart;
+
+
 
 
 
@@ -138,6 +157,8 @@ public class MainScreen extends JFrame {
                     e.printStackTrace();
         }
 
+        email = "testing@testing.com";
+
         // Get User Name
         connection = DatabaseManager.getConnection();
         userName = getUserName(email);
@@ -149,6 +170,9 @@ public class MainScreen extends JFrame {
 
         homePlaylistModel.setRowCount(0);
         getPlaylists(homePlaylistModel);
+
+        statsPlayListModel.setRowCount(0);
+        getPlaylists(statsPlayListModel);
 
         TableActionEvent event = new TableActionEvent() {
             @Override
@@ -519,17 +543,17 @@ public class MainScreen extends JFrame {
         };
 
         //#region JTable Settings
-        JTable homePlaylistTable = new JTable(homePlaylistModel);
+        homePlaylistTable = new JTable(homePlaylistModel);
         homePlaylistTable.setPreferredScrollableViewportSize(new Dimension(350, 200));
         homePlaylistTable.setFillsViewportHeight(true);
         homePlaylistTable.getTableHeader().setReorderingAllowed(false);
 
-        TableColumnModel homeColumnModel = homePlaylistTable.getColumnModel();
+        homeColumnModel = homePlaylistTable.getColumnModel();
         homeColumnModel.getColumn(0).setPreferredWidth(350);
         homeColumnModel.getColumn(0).setResizable(false);
         
 
-        JScrollPane homeScrollPane = new JScrollPane(homePlaylistTable);
+        homeScrollPane = new JScrollPane(homePlaylistTable);
         homeScrollPane.setPreferredSize(new Dimension(350, 200));//#endregion
 
 
@@ -956,8 +980,172 @@ public class MainScreen extends JFrame {
         //#region Song Stats panel
         JPanel songStatsPanel = new JPanel();
         songStatsPanel.setBackground(new Color(255, 255, 204)); 
+
+
+        //#region playlist table
+        statsPlayListModel = new DefaultTableModel(new Object[]{"playlist name"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        statsPlaylistTable = new JTable(statsPlayListModel);
+        statsPlaylistTable.setPreferredScrollableViewportSize(new Dimension(150, 200));
+        statsPlaylistTable.setFillsViewportHeight(true);
+        statsPlaylistTable.getTableHeader().setReorderingAllowed(false);
+        statsPlaylistTable.setSelectionBackground(new Color(21, 170, 180));
+        statsPlaylistTable.setRowHeight(30);
+        statsPlaylistTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // get the selected playlist
+        statsPlaylistTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                if (!evt.getValueIsAdjusting()) {
+                    int row = statsPlaylistTable.getSelectedRow();
+                    if (row != -1) {
+                        String playlist = (String) statsPlaylistTable.getValueAt(row, 0);
+                        statsSongModel.setRowCount(0);
+                        getSongsInPlaylist(statsSongModel, playlist);
+                    }
+                }
+            }
+        });
+
+        statsPlaylistColumnModel = statsPlaylistTable.getColumnModel();
+        statsPlaylistColumnModel.getColumn(0).setPreferredWidth(150);
+        statsPlaylistColumnModel.getColumn(0).setResizable(false);
+
+        statsPlaylistScrollPane = new JScrollPane(statsPlaylistTable);
+        statsPlaylistScrollPane.setPreferredSize(new Dimension(150, 200));//#endregion
+
+        //#region song table
+        statsSongModel = new DefaultTableModel(new Object[]{"song name", "artist", "album"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        statsSongTable = new JTable(statsSongModel);
+
+        statsSongTable.setPreferredScrollableViewportSize(new Dimension(450, 200));
+        statsSongTable.setFillsViewportHeight(true);
+        statsSongTable.getTableHeader().setReorderingAllowed(false);
+        statsSongTable.setSelectionBackground(new Color(21, 170, 180));
+        statsSongTable.setRowHeight(30);
+        statsSongTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        statsSongTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                if (!evt.getValueIsAdjusting()) {
+                    int row = statsSongTable.getSelectedRow();
+                    if (row != -1) {
+                        String song = (String) statsSongTable.getValueAt(row, 0);
+                        String artist = (String) statsSongTable.getValueAt(row, 1);
+                        String album = (String) statsSongTable.getValueAt(row, 2);
+                        int songId = getSongId(song, artist, album);
+
+                        statsFullModel.setRowCount(0);
+                        getSongStats(statsFullModel, songId);
+
+                        popularityChart.clearData();
+                        getPopularityChart(popularityChart, songId);
+
+                        rankingsChart.clearData();
+                        getRankingsChart(rankingsChart, songId);
+                    }
+                }
+            }
+        });
+
+        statsSongColumnModel = statsSongTable.getColumnModel();
+        statsSongColumnModel.getColumn(0).setPreferredWidth(150);
+        statsSongColumnModel.getColumn(0).setResizable(false);
+        statsSongColumnModel.getColumn(1).setPreferredWidth(150);
+        statsSongColumnModel.getColumn(1).setResizable(false);
+        statsSongColumnModel.getColumn(2).setPreferredWidth(150);
+        statsSongColumnModel.getColumn(2).setResizable(false);
+
+        statsSongScrollPane = new JScrollPane(statsSongTable);
+        statsSongScrollPane.setPreferredSize(new Dimension(450, 200));//#endregion
+
+        //#region stats table
+        statsFullModel = new DefaultTableModel(new Object[]{"stat", "value"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        statsFullTable = new JTable(statsFullModel);
+        statsFullTable.setPreferredScrollableViewportSize(new Dimension(200, 200));
+        statsFullTable.setFillsViewportHeight(true);
+        statsFullTable.getTableHeader().setReorderingAllowed(false);
+        statsFullTable.setSelectionBackground(new Color(21, 170, 180));
+
+        statsFullColumnModel = statsFullTable.getColumnModel();
+        statsFullColumnModel.getColumn(0).setPreferredWidth(100);
+        statsFullColumnModel.getColumn(0).setResizable(false);
+        statsFullColumnModel.getColumn(1).setPreferredWidth(50);
+        statsFullColumnModel.getColumn(1).setResizable(false);
+
+        statsFullScrollPane = new JScrollPane(statsFullTable);
+        statsFullScrollPane.setPreferredSize(new Dimension(200, 200));//#endregion
+
+        //#region line chart for popularity
+        popularityChart = new PopularityChart();
+        popularityChart.setPreferredSize(new Dimension(425, 425));
         //#endregion
 
+        //#region line chart for ranking
+        rankingsChart = new RankingsChart();
+        rankingsChart.setPreferredSize(new Dimension(425, 425));
+        //#endregion
+
+        //#region Create GroupLayout for songStatsPanel
+        GroupLayout songStatsLayout = new GroupLayout(songStatsPanel);
+
+        songStatsPanel.setLayout(songStatsLayout);
+
+        // Horizontal group
+        songStatsLayout.setHorizontalGroup(
+            songStatsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(songStatsLayout.createSequentialGroup()
+                    .addGap(50)
+                    .addComponent(statsPlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(50)
+                    .addComponent(statsSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(50)
+                    .addComponent(statsFullScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(songStatsLayout.createSequentialGroup()
+                    .addGap(50)
+                    .addComponent(popularityChart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(50)
+                    .addComponent(rankingsChart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );
+
+        // Vertical group
+        songStatsLayout.setVerticalGroup(
+            songStatsLayout.createSequentialGroup()
+                .addGap(100)
+                .addGroup(songStatsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(statsPlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(statsSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(statsFullScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(50)
+                .addGroup(songStatsLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(popularityChart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rankingsChart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(100)
+        );
+
+
+        //#endregion
+
+        //#endregion
+        
         //#region Settings panel
         JPanel settingsPanel = new JPanel();
         settingsPanel.setBackground(new Color(204, 255, 255));
@@ -1013,7 +1201,6 @@ public class MainScreen extends JFrame {
 
 
 
-    // Get user name
     public String getUserName(String email) {
         String query = "SELECT name FROM user WHERE email = ?";
         try {
@@ -1029,7 +1216,6 @@ public class MainScreen extends JFrame {
         return null;
     }
 
-    // get user id
     public int getUserId(String email) {
         String query = "SELECT user_id FROM user WHERE email = ?";
         try {
@@ -1289,6 +1475,108 @@ public class MainScreen extends JFrame {
             stmt.setInt(2, playlist_id);
 
             DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getSongsInPlaylist(DefaultTableModel model, String playlistName) {
+        int playlist_id = getPlaylistId(playlistName, user_id);
+        String sql = "SELECT s.song_name, s.song_artist, a.album_name " +
+                     "FROM song as s " +
+                     "JOIN album as a ON s.album_id = a.album_id " +
+                     "JOIN playlist_has_song as phs ON s.song_id = phs.song_id " +
+                     "WHERE phs.playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, playlist_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{rs.getString("song_name"), rs.getString("song_artist"), rs.getString("album_name")});
+            }
+        
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getSongStats(DefaultTableModel model, int songId) {
+        // select all from song_characteristics and select duration from the song table where song_id = songId
+        String sql = "SELECT song_characteristics.*, song.duration " + 
+                     "FROM song_characteristics " +
+                     "JOIN song ON song.song_id = song_characteristics.song_id " +
+                     "WHERE song_characteristics.song_id = ?";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, songId);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            model.setRowCount(0);
+            while (rs.next()) {
+                model.addRow(new Object[]{"Danceability", rs.getDouble("danceability")});
+                model.addRow(new Object[]{"Energy", rs.getDouble("energy")});
+                model.addRow(new Object[]{"Key", rs.getDouble("key")});
+                model.addRow(new Object[]{"Loudness", rs.getDouble("loudness")});
+                model.addRow(new Object[]{"Speechiness", rs.getDouble("speechiness")});
+                model.addRow(new Object[]{"Acousticness", rs.getDouble("acousticness")});
+                model.addRow(new Object[]{"Instrumentalness", rs.getDouble("instrumentalness")});
+                model.addRow(new Object[]{"Liveness", rs.getDouble("liveness")});
+                model.addRow(new Object[]{"Valence", rs.getDouble("valence")});
+                model.addRow(new Object[]{"Tempo", rs.getDouble("tempo")});
+                long durationMs = rs.getLong("duration");
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) % 60;
+                String durationStr = String.format("%02d:%02d", minutes, seconds);
+                model.addRow(new Object[]{"Duration", durationStr});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getPopularityChart(PopularityChart chart, int songId) {
+        String sql = "SELECT s.song_name, sp.snapshot_date, sp.popularity " +
+             "FROM song_popularity sp " +
+             "JOIN song s ON sp.song_id = s.song_id " +
+             "WHERE sp.song_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, songId);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+
+            while (rs.next()) {
+                Date sqlDate = rs.getDate("snapshot_date");
+                Date snapshotDate = new Date(sqlDate.getTime());
+                chart.addDataPoint(rs.getString("song_name"), snapshotDate, rs.getInt("popularity"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getRankingsChart(RankingsChart chart, int songId) {
+        String sql = "SELECT s.song_name, sp.snapshot_date, sp.daily_rank " +
+             "FROM song_popularity sp " +
+             "JOIN song s ON sp.song_id = s.song_id " +
+             "WHERE sp.song_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, songId);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+
+            while (rs.next()) {
+                Date sqlDate = rs.getDate("snapshot_date");
+                Date rankDate = new Date(sqlDate.getTime());
+                chart.addDataPoint(rs.getString("song_name"), rankDate, rs.getInt("daily_rank"));
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

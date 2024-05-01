@@ -7,6 +7,13 @@
   <dependencies>
 
   	<dependency>
+  		<groupId>org.jfree</groupId>
+  		<artifactId>jfreechart</artifactId>
+  		<version>1.5.4</version>
+  	</dependency>
+
+
+  	<dependency>
   		<groupId>com.kenai.nbpwr</groupId>
   		<artifactId>org-jdesktop-animation-timing</artifactId>
   		<version>1.0-201002281504</version>
