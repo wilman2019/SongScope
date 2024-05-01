@@ -2,29 +2,18 @@ package Java.Tables;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
-import Java.Database.DatabaseManager;
 
 import javax.swing.JPanel;
-import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 
 public class PanelAction extends JPanel {
 
     private ActionButton cmdAdd;
-    private Connection connection;
 
 
     public PanelAction() {
         initComponents();
-
-        connection = DatabaseManager.getConnection();
         
 
     }

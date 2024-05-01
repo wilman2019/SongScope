@@ -7,27 +7,20 @@ import javax.swing.UIManager;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.JButton;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import javax.swing.WindowConstants;
-import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.security.NoSuchAlgorithmException;
-import javax.swing.WindowConstants;
 
 public class ForgotPass extends JFrame{
     private JButton resetBtn;
@@ -43,7 +36,6 @@ public class ForgotPass extends JFrame{
     private ImageIcon icon;
     private JLabel iconLabel;
     private JLabel incorrectPasswordLabel;
-    private TextField nameText;
     private JLabel emailLabel;
     private Image image;
     private Image newImg;
