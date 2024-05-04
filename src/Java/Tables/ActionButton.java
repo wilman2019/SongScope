@@ -10,10 +10,6 @@ import java.awt.geom.Ellipse2D;
 import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
-/**
- *
- * @author RAVEN
- */
 public class ActionButton extends JButton {
 
     private boolean mousePress;

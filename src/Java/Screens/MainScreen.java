@@ -136,13 +136,36 @@ public class MainScreen extends JFrame {
     private JScrollPane statsSongScrollPane;
     private JTable homePlaylistTable;
     private TableColumnModel homeColumnModel;
-    private JScrollPane homeScrollPane;
     private JTable statsFullTable;
     private TableColumnModel statsFullColumnModel;
     private JScrollPane statsFullScrollPane;
     private DefaultTableModel statsFullModel;
     private PopularityChart popularityChart;
     private RankingsChart rankingsChart;
+    private DefaultTableModel comparePlayListModel;
+    private JTable comparePlaylistTable;
+    private TableColumnModel comparePlaylistColumnModel;
+    private JScrollPane comparePlaylistScrollPane;
+    private DefaultTableModel compareSongModel;
+    private JTable compareSongTable;
+    private TableColumnModel compareSongColumnModel;
+    private JScrollPane compareSongScrollPane;
+    private DefaultTableModel compareTableModel1;
+    private JTable compareTable1;
+    private TableColumnModel compareColumnModel1;
+    private JScrollPane compareScrollPane1;
+    private DefaultTableModel compareTableModel2;
+    private JTable compareTable2;
+    private TableColumnModel compareColumnModel2;
+    private JScrollPane compareScrollPane2;
+    private DefaultTableModel homeSongModel;
+    private JTable homeSongTable;
+    private JScrollPane homeSongScrollPane;
+    private JScrollPane homePlaylistScrollPane;
+    private SearchField playlistNameField;
+
+
+
 
 
 
@@ -156,8 +179,6 @@ public class MainScreen extends JFrame {
         } catch (Exception e) {
                     e.printStackTrace();
         }
-
-        email = "testing@testing.com";
 
         // Get User Name
         connection = DatabaseManager.getConnection();
@@ -174,9 +195,12 @@ public class MainScreen extends JFrame {
         statsPlayListModel.setRowCount(0);
         getPlaylists(statsPlayListModel);
 
+        comparePlayListModel.setRowCount(0);
+        getPlaylists(comparePlayListModel);
+
         TableActionEvent event = new TableActionEvent() {
             @Override
-            public void playlsitAdd(int row) {
+            public void playlistAdd(int row) {
                 String[] playlists = returnUserPlaylists();
 
                 // display an option pane with the playlists
@@ -206,16 +230,86 @@ public class MainScreen extends JFrame {
                     return;
                 }
 
-                // // add the song to the playlist
+                // add the song to the playlist
                 addSongToPlaylist(song_id, playlist_id);
 
 
             }
+            @Override
+            public void playlistRemove(int row) {
+                String playlist = (String) homePlaylistTable.getValueAt(row, 0);
+                int playlist_id = getPlaylistId(playlist, user_id);
+
+                int isSure = JOptionPane.showConfirmDialog(null, "Are you sure you want to remove the playlist?\n\n All Songs will be deleted", "Remove Playlist", JOptionPane.YES_NO_OPTION);
+                if (isSure == JOptionPane.NO_OPTION) {
+                    return;
+                }
+
+                removePlaylist(playlist_id);
+
+                if (homePlaylistTable.isEditing()) {
+                    homePlaylistTable.getCellEditor().stopCellEditing();
+                }
+                homePlaylistModel.removeRow(row);
+
+                homeSongModel.setRowCount(0);
+
+                comparePlayListModel.setRowCount(0);
+                getPlaylists(comparePlayListModel);
+
+                statsPlayListModel.setRowCount(0);
+                getPlaylists(statsPlayListModel);
+
+
+            }
+            @Override
+            public void removeFromPlaylist(int row) {
+                String playlist = (String) homePlaylistTable.getValueAt(homePlaylistTable.getSelectedRow(), 0);
+                int playlist_id = getPlaylistId(playlist, user_id);
+
+                int song_id = getSongId((String) homeSongModel.getValueAt(row, 0), (String) homeSongModel.getValueAt(row, 1), (String) homeSongModel.getValueAt(row, 2));
+
+                removeSongFromPlaylist(playlist_id, song_id);
+
+                if (homeSongTable.isEditing()) {
+                    homeSongTable.getCellEditor().stopCellEditing();
+                }
+                homeSongModel.removeRow(row);
+            }
+            @Override
+            public void compareTableAdd(int row) {
+                String[] tables = {"Table 1", "Table 2"};
+                int song_id = getSongId((String) compareSongModel.getValueAt(row, 0), (String) compareSongModel.getValueAt(row, 1), (String) compareSongModel.getValueAt(row, 2));
+
+                String table = (String) JOptionPane.showInputDialog(null, "Select a table to add the song to", "Add to Table", JOptionPane.QUESTION_MESSAGE, null, tables, tables[0]);
+                if (table == null) {
+                    // user pressed cancel
+                    return;
+                }
+
+                if (table.equals("Table 1")) {
+                    compareTableModel1.setRowCount(0);
+                    addSongToCompareTable(compareTableModel1, song_id);
+                } else {
+                    compareTableModel2.setRowCount(0);
+                    addSongToCompareTable(compareTableModel2, song_id);
+                }
+            }
         
         };
 
-        searchTable.getColumnModel().getColumn(4).setCellRenderer(new TableActionCellRender());
-        searchTable.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor(event));
+        searchTable.getColumnModel().getColumn(4).setCellRenderer(new TableActionCellRender("Add to Playlist"));
+        searchTable.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor(event, "Add to Playlist"));
+
+        homePlaylistTable.getColumnModel().getColumn(1).setCellRenderer(new TableActionCellRender("Remove Playlist"));
+        homePlaylistTable.getColumnModel().getColumn(1).setCellEditor(new TableActionCellEditor(event, "Remove Playlist"));
+
+        homeSongTable.getColumnModel().getColumn(4).setCellRenderer(new TableActionCellRender("Remove from Playlist"));
+        homeSongTable.getColumnModel().getColumn(4).setCellEditor(new TableActionCellEditor(event, "Remove from Playlist"));
+
+        compareSongTable.getColumnModel().getColumn(3).setCellRenderer(new TableActionCellRender("Add to Compare Table"));
+        compareSongTable.getColumnModel().getColumn(3).setCellEditor(new TableActionCellEditor(event, "Add to Compare Table"));
+
 
     }
 
@@ -297,6 +391,7 @@ public class MainScreen extends JFrame {
                 cardLayout.show(mainScreenPanel, "Home");
                 homePlaylistModel.setRowCount(0);
                 getPlaylists(homePlaylistModel);
+                homeSongModel.setRowCount(0);
 
             }
         });
@@ -385,6 +480,10 @@ public class MainScreen extends JFrame {
             public void actionPerformed(ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Compare");
+                comparePlayListModel.setRowCount(0);
+                getPlaylists(comparePlayListModel);
+                compareTableModel1.setRowCount(0);
+                compareTableModel2.setRowCount(0);
             }
         });
         buttonGroup.add(compareButton); 
@@ -471,6 +570,10 @@ public class MainScreen extends JFrame {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CardLayout cardLayout = (CardLayout) mainScreenPanel.getLayout();
                 cardLayout.show(mainScreenPanel, "Song Stats");
+                statsPlayListModel.setRowCount(0);
+                getPlaylists(statsPlayListModel);
+                statsSongModel.setRowCount(0);
+                statsFullModel.setRowCount(0);
             }
         });
         buttonGroup.add(songStatsButton);
@@ -521,8 +624,6 @@ public class MainScreen extends JFrame {
         
         //#endregion
 
-
-
         //#region Main Screen Panel (Panel in the middle of the screen that holds different screens)
         mainScreenPanel = new JPanel(new CardLayout());
         mainScreenPanel.setBackground(new Color(204,204,204));
@@ -534,28 +635,137 @@ public class MainScreen extends JFrame {
         JPanel homePanel = new JPanel();
         homePanel.setBackground(new Color(204, 204, 204)); 
 
-        homePlaylistModel = new DefaultTableModel(new Object[]{"playlist name"}, 0) {
+        //#region Playlist Name Field
+        playlistNameField = new SearchField(null);
+        playlistNameField.setLabelText("Playlist Name");
+        playlistNameField.setFont(new Font("Helvetica Neue", 0, 15));
+        playlistNameField.setPreferredSize(new Dimension(200, 30));
+        playlistNameField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                String playlist = playlistNameField.getText();
+                if (playlist.equals("")) {
+                    JOptionPane.showMessageDialog(null, "Playlist name cannot be empty", "Empty Playlist Name", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (playlistExists(playlist)) {
+                    JOptionPane.showMessageDialog(null, "Playlist already exists", "Playlist Exists", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                addPlaylist(playlist);
+                homePlaylistModel.setRowCount(0);
+                getPlaylists(homePlaylistModel);
+
+                comparePlayListModel.setRowCount(0);
+                getPlaylists(comparePlayListModel);
+
+                statsPlayListModel.setRowCount(0);
+                getPlaylists(statsPlayListModel);
+
+                playlistNameField.setText("");
+            }
+        });//#endregion
+        
+        //#region Playlist Add Button
+        JButton playlistAddButton = new JButton("Add Playlist");
+        playlistAddButton.setFont(new Font("Helvetica Neue", 0, 15));
+        playlistAddButton.setBackground(new Color(21, 170, 180));
+        playlistAddButton.setForeground(new Color(255, 255, 255));
+        playlistAddButton.setFocusPainted(false);
+        playlistAddButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                String playlist = playlistNameField.getText();
+                if (playlist.equals("")) {
+                    JOptionPane.showMessageDialog(null, "Playlist name cannot be empty", "Empty Playlist Name", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (playlistExists(playlist)) {
+                    JOptionPane.showMessageDialog(null, "Playlist already exists", "Playlist Exists", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                addPlaylist(playlist);
+                homePlaylistModel.setRowCount(0);
+                getPlaylists(homePlaylistModel);
+
+                comparePlayListModel.setRowCount(0);
+                getPlaylists(comparePlayListModel);
+
+                statsPlayListModel.setRowCount(0);
+                getPlaylists(statsPlayListModel);
+
+                playlistNameField.setText("");
+            }
+        });//#endregion
+
+        //#region Playlist Table
+        homePlaylistModel = new DefaultTableModel(new Object[]{"Playlist Name", "Remove"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 1;
             }
 
         };
 
-        //#region JTable Settings
+
         homePlaylistTable = new JTable(homePlaylistModel);
-        homePlaylistTable.setPreferredScrollableViewportSize(new Dimension(350, 200));
+        homePlaylistTable.setPreferredScrollableViewportSize(new Dimension(200, 200));
         homePlaylistTable.setFillsViewportHeight(true);
         homePlaylistTable.getTableHeader().setReorderingAllowed(false);
+        homePlaylistTable.setSelectionBackground(new Color(21, 170, 180));
+        homePlaylistTable.setRowHeight(30);
+        homePlaylistTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        homePlaylistTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                if (evt.getValueIsAdjusting()) {
+                    return;
+                }
+                int row = homePlaylistTable.getSelectedRow();
+                if (row == -1) {
+                    return;
+                }
+                String playlist = (String) homePlaylistModel.getValueAt(row, 0);
+                homeSongModel.setRowCount(0);
+                homeScreenGetSongs(homeSongModel, playlist);
+            }
+        });
 
         homeColumnModel = homePlaylistTable.getColumnModel();
-        homeColumnModel.getColumn(0).setPreferredWidth(350);
+        homeColumnModel.getColumn(0).setPreferredWidth(200);
         homeColumnModel.getColumn(0).setResizable(false);
         
 
-        homeScrollPane = new JScrollPane(homePlaylistTable);
-        homeScrollPane.setPreferredSize(new Dimension(350, 200));//#endregion
+        homePlaylistScrollPane = new JScrollPane(homePlaylistTable);
+        homePlaylistScrollPane.setPreferredSize(new Dimension(200, 200));//#endregion
 
+        //#region Home Song Table
+        homeSongModel = new DefaultTableModel(new Object[]{"Song Name", "Artist Name", "Album Name", "Duration", "Remove"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 4;
+            }
+        };
+
+        homeSongTable = new JTable(homeSongModel);
+        homeSongTable.setPreferredScrollableViewportSize(new Dimension(800, 400));
+        homeSongTable.setFillsViewportHeight(true);
+        homeSongTable.getTableHeader().setReorderingAllowed(false);
+        homeSongTable.setSelectionBackground(new Color(21, 170, 180));
+        homeSongTable.setRowHeight(30);
+        homeSongTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        homeColumnModel = homeSongTable.getColumnModel();
+        homeColumnModel.getColumn(0).setPreferredWidth(200);
+        homeColumnModel.getColumn(0).setResizable(false);
+        homeColumnModel.getColumn(1).setPreferredWidth(200);
+        homeColumnModel.getColumn(1).setResizable(false);
+        homeColumnModel.getColumn(2).setPreferredWidth(200);
+        homeColumnModel.getColumn(2).setResizable(false);
+        homeColumnModel.getColumn(3).setPreferredWidth(100);
+        homeColumnModel.getColumn(3).setResizable(false);
+        homeColumnModel.getColumn(4).setPreferredWidth(100);
+        homeColumnModel.getColumn(4).setResizable(false);
+
+        homeSongScrollPane = new JScrollPane(homeSongTable);
+        homeSongScrollPane.setPreferredSize(new Dimension(800, 400));//#endregion
 
         //#region Create GroupLayout for homePanel
         GroupLayout homeLayout = new GroupLayout(homePanel);
@@ -563,18 +773,29 @@ public class MainScreen extends JFrame {
 
         // Horizontal group
         homeLayout.setHorizontalGroup(
-            homeLayout.createSequentialGroup()
-                .addGap(600)
-                .addComponent(homeScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addGap(50)
+            homeLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(homeLayout.createSequentialGroup()
+                    .addGap(100)
+                    .addComponent(homePlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(100)
+                    .addComponent(playlistNameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(25)
+                    .addComponent(playlistAddButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(homeLayout.createSequentialGroup()
+                    .addGap(100)
+                    .addComponent(homeSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
 
         // Vertical group
         homeLayout.setVerticalGroup(
-            homeLayout.createSequentialGroup()
-                .addGap(100)
-                .addComponent(homeScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addGap(400)
+        homeLayout.createSequentialGroup()
+            .addGap(50)
+            .addGroup(homeLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addComponent(homePlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(playlistNameField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(playlistAddButton, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+            .addGap(100)
+            .addComponent(homeSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE) 
         );//#endregion
 
         //#endregion
@@ -582,8 +803,6 @@ public class MainScreen extends JFrame {
         //#region Search panel
         searchPanel = new JPanel();
         searchPanel.setBackground(new Color(255, 204, 204));
-
-
 
         //#region Create advanced search menu
         advancedSearchPanel = new JPanel();
@@ -879,14 +1098,12 @@ public class MainScreen extends JFrame {
         //#endregion
 
         //#region JTable Settings
-        // Create DefaultTableModel
-        // Create JTable
         searchTable = new JTable();
         searchTable.setPreferredScrollableViewportSize(new Dimension(900, 400));
         searchTable.setFillsViewportHeight(true);
         searchTable.getTableHeader().setReorderingAllowed(false);
         searchTable.setSelectionBackground(new Color(21, 170, 180));
-        searchTable.setRowHeight(20);
+        searchTable.setRowHeight(30);
 
 
         searchModel = new DefaultTableModel(
@@ -975,6 +1192,160 @@ public class MainScreen extends JFrame {
         //#region Compare panel
         JPanel comparePanel = new JPanel();
         comparePanel.setBackground(new Color(204, 204, 255)); 
+
+        //#region playlist table
+        comparePlayListModel = new DefaultTableModel(new Object[]{"playlist name"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        comparePlaylistTable = new JTable(comparePlayListModel);
+        comparePlaylistTable.setPreferredScrollableViewportSize(new Dimension(150, 200));
+        comparePlaylistTable.setFillsViewportHeight(true);
+        comparePlaylistTable.getTableHeader().setReorderingAllowed(false);
+        comparePlaylistTable.setSelectionBackground(new Color(21, 170, 180));
+        comparePlaylistTable.setRowHeight(30);
+        comparePlaylistTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        // get the selected playlist
+        comparePlaylistTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                if (!evt.getValueIsAdjusting()) {
+                    int row = comparePlaylistTable.getSelectedRow();
+                    if (row != -1) {
+                        String playlist = (String) comparePlaylistTable.getValueAt(row, 0);
+                        compareSongModel.setRowCount(0);
+                        getSongsInPlaylist(compareSongModel, playlist);
+                    }
+                }
+            }
+        });
+
+        comparePlaylistColumnModel = comparePlaylistTable.getColumnModel();
+        comparePlaylistColumnModel.getColumn(0).setPreferredWidth(150);
+        comparePlaylistColumnModel.getColumn(0).setResizable(false);
+
+        comparePlaylistScrollPane = new JScrollPane(comparePlaylistTable);
+        comparePlaylistScrollPane.setPreferredSize(new Dimension(150, 200));//#endregion
+
+        //#region song table
+        compareSongModel = new DefaultTableModel(new Object[]{"song name", "artist", "album", "Add to Table"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 3;
+            }
+
+        };
+
+        compareSongTable = new JTable(compareSongModel);
+
+        compareSongTable.setPreferredScrollableViewportSize(new Dimension(550, 200));
+        compareSongTable.setFillsViewportHeight(true);
+        compareSongTable.getTableHeader().setReorderingAllowed(false);
+        compareSongTable.setSelectionBackground(new Color(21, 170, 180));
+        compareSongTable.setRowHeight(30);
+        compareSongTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        compareSongColumnModel = compareSongTable.getColumnModel();
+        compareSongColumnModel.getColumn(0).setPreferredWidth(150);
+        compareSongColumnModel.getColumn(0).setResizable(false);
+        compareSongColumnModel.getColumn(1).setPreferredWidth(150);
+        compareSongColumnModel.getColumn(1).setResizable(false);
+        compareSongColumnModel.getColumn(2).setPreferredWidth(150);
+        compareSongColumnModel.getColumn(2).setResizable(false);
+        compareSongColumnModel.getColumn(3).setPreferredWidth(100);
+        compareSongColumnModel.getColumn(3).setResizable(false);
+
+        compareSongScrollPane = new JScrollPane(compareSongTable);
+        compareSongScrollPane.setPreferredSize(new Dimension(550, 200));//#endregion
+
+        //#region compare table 1
+        compareTableModel1 = new DefaultTableModel(new Object[]{"stat", "value"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        compareTable1 = new JTable(compareTableModel1);
+        compareTable1.setPreferredScrollableViewportSize(new Dimension(200, 382));
+        compareTable1.setFillsViewportHeight(true);
+        compareTable1.getTableHeader().setReorderingAllowed(false);
+        compareTable1.setSelectionBackground(new Color(21, 170, 180));
+        compareTable1.setRowHeight(30);
+
+        compareColumnModel1 = compareTable1.getColumnModel();
+        compareColumnModel1.getColumn(0).setPreferredWidth(100);
+        compareColumnModel1.getColumn(0).setResizable(false);
+        compareColumnModel1.getColumn(1).setPreferredWidth(50);
+        compareColumnModel1.getColumn(1).setResizable(false);
+
+        compareScrollPane1 = new JScrollPane(compareTable1);
+        compareScrollPane1.setPreferredSize(new Dimension(200, 382));//#endregion
+
+        //#region compare table 2
+        compareTableModel2 = new DefaultTableModel(new Object[]{"stat", "value"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+
+        };
+
+        compareTable2 = new JTable(compareTableModel2);
+        compareTable2.setPreferredScrollableViewportSize(new Dimension(200, 382));
+        compareTable2.setFillsViewportHeight(true);
+        compareTable2.getTableHeader().setReorderingAllowed(false);
+        compareTable2.setSelectionBackground(new Color(21, 170, 180));
+        compareTable2.setRowHeight(30);
+
+        compareColumnModel2 = compareTable2.getColumnModel();
+        compareColumnModel2.getColumn(0).setPreferredWidth(100);
+        compareColumnModel2.getColumn(0).setResizable(false);
+        compareColumnModel2.getColumn(1).setPreferredWidth(50);
+        compareColumnModel2.getColumn(1).setResizable(false);
+
+        compareScrollPane2 = new JScrollPane(compareTable2);
+        compareScrollPane2.setPreferredSize(new Dimension(200, 382));//#endregion
+
+
+        //#region Group Layout for comparePanel
+        GroupLayout compareLayout = new GroupLayout(comparePanel);
+        comparePanel.setLayout(compareLayout);
+
+        // Horizontal group
+        compareLayout.setHorizontalGroup(
+            compareLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(compareLayout.createSequentialGroup()
+                    .addGap(125)
+                    .addComponent(comparePlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(50)
+                    .addComponent(compareSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(compareLayout.createSequentialGroup()
+                    .addGap(250)
+                    .addComponent(compareScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(100)
+                    .addComponent(compareScrollPane2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGap(250))
+        );
+
+        // Vertical group
+        compareLayout.setVerticalGroup(
+            compareLayout.createSequentialGroup()
+                .addGap(50)
+                .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(comparePlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(compareSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(100)
+                .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(compareScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(compareScrollPane2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGap(100)
+        );//#endregion
+
         //#endregion
         
         //#region Song Stats panel
@@ -1289,10 +1660,6 @@ public class MainScreen extends JFrame {
     }
 
     public void advancedSearch(DefaultTableModel model) {
-
-        // get all fields from advanced search panel (not sure if they can be null)
-        // search in song characteristics table and get song id
-        // use the song id to get song info from song table
         String artist = artistName.getText().isEmpty() ? "" : artistName.getText();
         String song = songName.getText().isEmpty() ? "" : songName.getText();
         String album = albumName.getText().isEmpty() ? "" : albumName.getText();
@@ -1318,7 +1685,7 @@ public class MainScreen extends JFrame {
         int popularityHigh = popularityMax.getText().isEmpty() ? 100 : Integer.parseInt(popularityMax.getText());
 
         try {
-            String sql = "SELECT s.song_name, s.song_artist, s.duration, a.album_name "
+            String sql = "SELECT DISTINCT s.song_name, s.song_artist, s.duration, a.album_name "
                         + "FROM song as s "
                         + "JOIN album as a ON s.album_id = a.album_id "
                         + "JOIN song_characteristics as sc ON s.song_id = sc.song_id "
@@ -1370,10 +1737,6 @@ public class MainScreen extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
 
     }
 
@@ -1582,11 +1945,154 @@ public class MainScreen extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
-        MainScreen test = new MainScreen(null);
-        test.setVisible(true);
-        test.setLocationRelativeTo(null);
-        
+    public void addSongToCompareTable(DefaultTableModel model, int songId) {
+        // select all from song_characteristics and select duration from the song table and select highest popularity from song_popularity where song_id = songId
+        String sql = "SELECT song_characteristics.*, song.duration, MAX(sp.popularity) as popularity " + 
+                     "FROM song_characteristics " +
+                     "JOIN song ON song.song_id = song_characteristics.song_id " +
+                     "JOIN song_popularity sp ON song.song_id = sp.song_id " +
+                     "WHERE song_characteristics.song_id = ?";
+
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, songId);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            System.out.println("Song ID: " + songId);
+            while (rs.next()) {
+                model.addRow(new Object[]{"Danceability", rs.getDouble("danceability")});
+                model.addRow(new Object[]{"Energy", rs.getDouble("energy")});
+                model.addRow(new Object[]{"Key", rs.getDouble("key")});
+                model.addRow(new Object[]{"Loudness", rs.getDouble("loudness")});
+                model.addRow(new Object[]{"Speechiness", rs.getDouble("speechiness")});
+                model.addRow(new Object[]{"Acousticness", rs.getDouble("acousticness")});
+                model.addRow(new Object[]{"Instrumentalness", rs.getDouble("instrumentalness")});
+                model.addRow(new Object[]{"Liveness", rs.getDouble("liveness")});
+                model.addRow(new Object[]{"Valence", rs.getDouble("valence")});
+                model.addRow(new Object[]{"Tempo", rs.getDouble("tempo")});
+                long durationMs = rs.getLong("duration");
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) % 60;
+                String durationStr = String.format("%02d:%02d", minutes, seconds);
+                model.addRow(new Object[]{"Duration", durationStr});
+                model.addRow(new Object[]{"Popularity", rs.getInt("popularity")});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
         
     }
+
+    public boolean playlistExists(String playlistName) {
+        String sql = "SELECT * FROM playlist WHERE user_id = ? AND playlist_name = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+            stmt.setString(2, playlistName);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void addPlaylist(String playlistName) {
+        String sql = "INSERT INTO playlist (user_id, playlist_name) VALUES (?, ?)";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, user_id);
+            stmt.setString(2, playlistName);
+
+            DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removePlaylist(int playlistId) {
+        // remove all songs from playlist_has_song where playlist_id = playlistId
+        String sql = "DELETE FROM playlist_has_song WHERE playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, playlistId);
+
+            DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        sql = "DELETE FROM playlist WHERE playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, playlistId);
+
+            DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void removeSong(String songName, String artistName, String albumName, String playlistName) {
+        int song_id = getSongId(songName, artistName, albumName);
+        int playlist_id = getPlaylistId(playlistName, user_id);
+        String sql = "DELETE FROM playlist_has_song WHERE song_id = ? AND playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
+            stmt.setInt(2, playlist_id);
+
+            DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void homeScreenGetSongs(DefaultTableModel model, String playlistName) {
+        int playlist_id = getPlaylistId(playlistName, user_id);
+        String sql = "SELECT s.song_name, s.song_artist, a.album_name, s.duration " +
+                     "FROM song as s " +
+                     "JOIN album as a ON s.album_id = a.album_id " +
+                     "JOIN playlist_has_song as phs ON s.song_id = phs.song_id " +
+                     "WHERE phs.playlist_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, playlist_id);
+
+            ResultSet rs = DatabaseManager.query(stmt);
+            model.setRowCount(0);
+            while (rs.next()) {
+                long durationMs = rs.getLong("duration");
+                long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs);
+                long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMs) % 60;
+                String durationStr = String.format("%02d:%02d", minutes, seconds);
+                model.addRow(new Object[]{rs.getString("song_name"), rs.getString("song_artist"), rs.getString("album_name"), durationStr});
+            }
+        
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+    }
+
+    public void removeSongFromPlaylist(int playlist_id, int song_id) {
+        String sql = "DELETE FROM playlist_has_song WHERE playlist_id = ? AND song_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, playlist_id);
+            stmt.setInt(2, song_id);
+
+            DatabaseManager.update(stmt);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

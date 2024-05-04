@@ -9,29 +9,88 @@ import javax.swing.ImageIcon;
 
 public class PanelAction extends JPanel {
 
-    private ActionButton cmdAdd;
+    private String selectedAction;
+
+    private ActionButton cmdAddToPlaylist;
+    private ActionButton cmdRemovePlaylist;
+    private ActionButton cmdAddToCompareTable;
+    private ActionButton cmdRemoveFromPlaylist;
 
 
-    public PanelAction() {
+    public PanelAction(String selectedAction) {
+        this.selectedAction = selectedAction;
         initComponents();
         
 
     }
 
     public void initEvent(TableActionEvent event, int row) {
-        cmdAdd.addActionListener(new ActionListener() {
+
+        cmdAddToPlaylist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                event.playlsitAdd(row);
+                event.playlistAdd(row);
+
+            }
+        });
+        cmdRemovePlaylist.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                event.playlistRemove(row);
+            }
+        });
+        cmdAddToCompareTable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                event.compareTableAdd(row);
+            }
+        });
+        cmdRemoveFromPlaylist.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                event.removeFromPlaylist(row);
             }
         });
     }
 
     private void initComponents() {
 
-        cmdAdd = new ActionButton();
+        cmdAddToPlaylist = new ActionButton();
+        cmdRemovePlaylist = new ActionButton();
+        cmdAddToCompareTable = new ActionButton();
+        cmdRemoveFromPlaylist = new ActionButton();
 
-        cmdAdd.setIcon(new ImageIcon("src/img/plus-8.png")); 
+        cmdAddToPlaylist.setIcon(new ImageIcon("src/img/plus-8.png"));
+        cmdRemovePlaylist.setIcon(new ImageIcon("src/img/minus-8.png"));
+        cmdAddToCompareTable.setIcon(new ImageIcon("src/img/plus-8.png"));
+        cmdRemoveFromPlaylist.setIcon(new ImageIcon("src/img/minus-8.png"));
+
+        if (selectedAction.equals("Add to Playlist")) {
+            cmdAddToPlaylist.setVisible(true);
+            cmdRemovePlaylist.setVisible(false);
+            cmdAddToCompareTable.setVisible(false);
+            cmdRemoveFromPlaylist.setVisible(false);
+        } else if (selectedAction.equals("Remove Playlist")){
+            cmdAddToPlaylist.setVisible(false);
+            cmdRemovePlaylist.setVisible(true);
+            cmdAddToCompareTable.setVisible(false);
+            cmdRemoveFromPlaylist.setVisible(false);
+        } else if (selectedAction.equals("Add to Compare Table")) {
+            cmdAddToPlaylist.setVisible(false);
+            cmdRemovePlaylist.setVisible(false);
+            cmdAddToCompareTable.setVisible(true);
+            cmdRemoveFromPlaylist.setVisible(false);
+        } else if (selectedAction.equals("Remove from Playlist")) {
+            cmdAddToPlaylist.setVisible(false);
+            cmdRemovePlaylist.setVisible(false);
+            cmdAddToCompareTable.setVisible(false);
+            cmdRemoveFromPlaylist.setVisible(true);
+        } else {
+            cmdAddToPlaylist.setVisible(false);
+            cmdRemovePlaylist.setVisible(false);
+            cmdAddToCompareTable.setVisible(false);
+            cmdRemoveFromPlaylist.setVisible(false);
+        }
 
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
@@ -39,16 +98,24 @@ public class PanelAction extends JPanel {
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(cmdAdd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(cmdAddToPlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdRemovePlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdAddToCompareTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmdRemoveFromPlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(2)
-                .addComponent(cmdAdd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addGap(2))
+                .addGap(7)
+                .addComponent(cmdAddToPlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(cmdRemovePlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(cmdAddToCompareTable, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(cmdRemoveFromPlaylist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addGap(7))
         );
+
     }
 
 
