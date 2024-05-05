@@ -165,8 +165,8 @@ public class MainScreen extends JFrame {
     private SearchField playlistNameField;
     private JLabel compareTable1Label;
     private JLabel compareTable2Label;
-    private String compareSong1 = "testing";
-    private String compareSong2 = "testing";
+    private String compareSong1 = "";
+    private String compareSong2 = "";
 
 
 
