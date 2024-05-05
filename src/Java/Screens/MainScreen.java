@@ -163,11 +163,10 @@ public class MainScreen extends JFrame {
     private JScrollPane homeSongScrollPane;
     private JScrollPane homePlaylistScrollPane;
     private SearchField playlistNameField;
-
-
-
-
-
+    private JLabel compareTable1Label;
+    private JLabel compareTable2Label;
+    private String compareSong1 = "testing";
+    private String compareSong2 = "testing";
 
 
 
@@ -290,9 +289,14 @@ public class MainScreen extends JFrame {
                 if (table.equals("Table 1")) {
                     compareTableModel1.setRowCount(0);
                     addSongToCompareTable(compareTableModel1, song_id);
+                    compareSong1 = (String) compareSongModel.getValueAt(row, 0);
+                    compareTable1Label.setText(compareSong1);
+
                 } else {
                     compareTableModel2.setRowCount(0);
                     addSongToCompareTable(compareTableModel2, song_id);
+                    compareSong2 = (String) compareSongModel.getValueAt(row, 0);
+                    compareTable2Label.setText(compareSong2);
                 }
             }
         
@@ -1261,6 +1265,16 @@ public class MainScreen extends JFrame {
         compareSongScrollPane = new JScrollPane(compareSongTable);
         compareSongScrollPane.setPreferredSize(new Dimension(550, 200));//#endregion
 
+        //#region Compare table 1 label
+        compareTable1Label = new JLabel(compareSong1);
+        compareTable1Label.setFont(new Font("Helvetica Neue", 0, 20));
+        compareTable1Label.setForeground(new Color(21, 170, 180));//#endregion
+
+        //#region Compare table 2 label
+        compareTable2Label = new JLabel(compareSong2);
+        compareTable2Label.setFont(new Font("Helvetica Neue", 0, 20));
+        compareTable2Label.setForeground(new Color(21, 170, 180));//#endregion
+
         //#region compare table 1
         compareTableModel1 = new DefaultTableModel(new Object[]{"stat", "value"}, 0) {
             @Override
@@ -1326,9 +1340,13 @@ public class MainScreen extends JFrame {
                     .addComponent(compareSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addGroup(compareLayout.createSequentialGroup()
                     .addGap(250)
-                    .addComponent(compareScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(compareTable1Label, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(compareScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addGap(100)
-                    .addComponent(compareScrollPane2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(compareTable2Label, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(compareScrollPane2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addGap(250))
         );
 
@@ -1340,6 +1358,9 @@ public class MainScreen extends JFrame {
                     .addComponent(comparePlaylistScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(compareSongScrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addGap(100)
+                .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                    .addComponent(compareTable1Label, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(compareTable2Label, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addGroup(compareLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(compareScrollPane1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(compareScrollPane2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -2094,5 +2115,19 @@ public class MainScreen extends JFrame {
         }
     }
 
+    public String getSongName(int song_id) {
+        String sql = "SELECT song_name FROM song WHERE song_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, song_id);
 
+            ResultSet rs = DatabaseManager.query(stmt);
+            if (rs.next()) {
+                return rs.getString("song_name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
