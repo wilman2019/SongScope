@@ -2,6 +2,7 @@
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Tables/TableActionCellEditor.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Tables/TableActionEvent.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Screens/LoginScreen.java
+/Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Charts/RankingsChart.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Database/DatabaseManager.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Tables/ActionButton.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/TextFields/PasswordField.java
@@ -9,6 +10,7 @@
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/TextFields/SearchField.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Screens/MainScreen.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Tables/TableActionCellRender.java
+/Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Charts/PopularityChart.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/TextFields/TextField.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Tables/PanelAction.java
 /Users/colinlewandowski/Documents/GitHub/SongScope/src/Java/Screens/ForgotPass.java
